@@ -1,0 +1,7 @@
+alembic==1.17.1
+pyramid==2.0.2
+pyramid-tm==2.6
+sqlalchemy==1.4.54
+openpyxl==3.1.5
+psycopg2==2.9.11
+pydantic-settings==2.11.0

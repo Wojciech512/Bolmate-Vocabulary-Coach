@@ -1,0 +1,20 @@
+# Config files
+*.ini
+!example.ini
+
+# Idea
+.idea
+
+# Python
+*.pyc
+**/__pycache__/*
+env
+dist
+build
+**/*egg-info
+.DS_store
+
+# TypeScript
+node_modules
+*.lock
+.yarn
