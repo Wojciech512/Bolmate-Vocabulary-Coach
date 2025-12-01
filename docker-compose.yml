@@ -1,4 +1,9 @@
 version: '3.9'
+#TODO aplikacja w trybie deweloperskim docker-compose.dev
+#  - współdzielone pliki między hostem a kontenerem
+#TODO aplikacja trybie produkcyjnym osobny docker-compose.prod
+#  - nie współdzielone pliki między hostem a kontenerem
+#  - własna sieć
 
 services:
   db:

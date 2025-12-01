@@ -6,13 +6,16 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 RUN apt-get update \
-    && apt-get install -y build-essential libpq-dev \
+    && apt-get install -y build-essential libpq-dev dos2unix bash \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
+
+RUN dos2unix /app/scripts/entrypoint.sh \
+    && chmod +x /app/scripts/entrypoint.sh
 
 RUN adduser --disabled-password --gecos '' appuser \
     && chown -R appuser:appuser /app
