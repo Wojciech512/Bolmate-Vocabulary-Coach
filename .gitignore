@@ -1,6 +1,9 @@
 # Config files
 *.ini
 !example.ini
+.env
+.env.local
+!.env.example
 
 # Idea
 .idea
@@ -18,3 +21,6 @@ build
 node_modules
 *.lock
 .yarn
+
+# Runtime
+postgres_data

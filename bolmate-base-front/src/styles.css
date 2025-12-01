@@ -1,0 +1,131 @@
+:root {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #101828;
+  background-color: #f8fafc;
+}
+
+body {
+  margin: 0;
+  background: #f8fafc;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+header {
+  background: #0f172a;
+  color: #fff;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 20px;
+}
+
+nav a {
+  color: #cbd5f5;
+  margin-left: 16px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+nav a.active {
+  color: #fff;
+  text-decoration: underline;
+}
+
+main {
+  max-width: 960px;
+  padding: 24px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+footer {
+  padding: 12px 24px;
+  background: #e2e8f0;
+  color: #334155;
+  text-align: center;
+}
+
+.panel {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.form {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.form label {
+  display: grid;
+  gap: 6px;
+  color: #475569;
+}
+
+.form input {
+  border: 1px solid #cbd5e1;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.form button {
+  justify-self: start;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.form button:hover {
+  background: #1d4ed8;
+}
+
+.status {
+  margin: 8px 0;
+  color: #0f172a;
+}
+
+.users {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.users li {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px;
+  background: #f8fafc;
+  display: grid;
+  gap: 4px;
+}
+
+.users strong {
+  font-size: 16px;
+}
+
+.users span {
+  color: #475569;
+}
+
+.users small {
+  color: #94a3b8;
+}
