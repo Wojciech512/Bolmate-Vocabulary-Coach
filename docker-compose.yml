@@ -1,9 +1,11 @@
-version: '3.9'
 #TODO aplikacja w trybie deweloperskim docker-compose.dev
 #  - współdzielone pliki między hostem a kontenerem
 #TODO aplikacja trybie produkcyjnym osobny docker-compose.prod
 #  - nie współdzielone pliki między hostem a kontenerem
 #  - własna sieć
+
+#TODO formatery kodu: black, isort, flake8, prettier, pep8
+version: '3.9'
 
 services:
   db:
@@ -16,13 +18,19 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d bolmate_base" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   backend:
     build: ./bolmate-base-core
     env_file:
       - ./bolmate-base-core/.env
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     ports:
       - "5000:5000"
 
