@@ -1,6 +1,6 @@
 # Config files
 *.ini
-!example.ini
+!.env.example
 
 # Idea
 .idea
@@ -8,13 +8,15 @@
 # Python
 *.pyc
 **/__pycache__/*
+.env
+.env.local
+venv
 env
 dist
 build
 **/*egg-info
 .DS_store
 
-# TypeScript
+# TypeScript / Node
 node_modules
-*.lock
 .yarn

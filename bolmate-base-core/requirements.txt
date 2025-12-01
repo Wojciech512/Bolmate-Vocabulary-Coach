@@ -1,7 +1,8 @@
-alembic==1.17.1
-pyramid==2.0.2
-pyramid-tm==2.6
-sqlalchemy==1.4.54
-openpyxl==3.1.5
-psycopg2==2.9.11
-pydantic-settings==2.11.0
+Flask==3.0.3
+SQLAlchemy==1.4.54
+alembic==1.13.2
+psycopg2==2.9.9
+pydantic==2.8.2
+pydantic-settings==2.6.1
+python-dotenv==1.0.1
+gunicorn==23.0.0

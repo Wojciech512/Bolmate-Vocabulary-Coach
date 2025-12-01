@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: bolmate
+      POSTGRES_PASSWORD: bolmate
+      POSTGRES_DB: bolmate
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./bolmate-base-core
+    env_file:
+      - ./bolmate-base-core/.env.example
+    environment:
+      DATABASE_HOST: db
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+
+  frontend:
+    build: ./bolmate-base-front
+    environment:
+      VITE_API_BASE_URL: http://backend:5000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  db_data:
