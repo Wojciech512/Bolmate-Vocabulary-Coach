@@ -1,0 +1,16 @@
+.home {
+  display: grid;
+  gap: 12px;
+}
+
+.home p {
+  max-width: 720px;
+}
+
+.home ul {
+  padding-left: 20px;
+}
+
+.home li {
+  margin-bottom: 6px;
+}

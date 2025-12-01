@@ -1,16 +1,11 @@
 [project]
 name = "bolmate_base"
-version = "0.0.1"
-description = "Bolamte base backend"
+version = "0.1.0"
+description = "Bolmate base Flask backend"
 readme = "README.md"
-requires-python = ">=3.13"
-authors = [{ name = "Dave van Rijn Development", email = "develop@davevanrijn.nl" }]
+requires-python = ">=3.12"
+authors = [{ name = "Bolmate", email = "dev@example.com" }]
 dynamic = ["dependencies"]
-
-[project.optional-dependencies]
-dev = [
-    "waitress==3.0.2",
-]
 
 [tool.setuptools.dynamic]
 dependencies = { file = ["requirements.txt"] }
