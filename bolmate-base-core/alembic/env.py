@@ -21,7 +21,8 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-database_url = os.getenv("DATABASE_URL", DEFAULT_DATABASE_URL)
+# fall back to default if the env var is missing or empty
+database_url = os.getenv("DATABASE_URL") or DEFAULT_DATABASE_URL
 config.set_main_option("sqlalchemy.url", database_url)
 
 target_metadata = Base.metadata

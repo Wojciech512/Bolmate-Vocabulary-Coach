@@ -27,7 +27,8 @@ DEFAULT_DATABASE_URL = "postgresql+psycopg2://postgres:postgres@db:5432/bolmate_
 def get_settings() -> Settings:
     load_env()
     environment = os.getenv("FLASK_ENV", "development")
-    database_url = os.getenv("DATABASE_URL", DEFAULT_DATABASE_URL)
+    # honor default URL when env var is missing or empty
+    database_url = os.getenv("DATABASE_URL") or DEFAULT_DATABASE_URL
     debug = environment != "production"
     host = os.getenv("FLASK_RUN_HOST", "0.0.0.0")
     port = int(os.getenv("FLASK_RUN_PORT", "5000"))
