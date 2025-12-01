@@ -2,14 +2,16 @@
 set -e
 
 if [ -f /app/.env ]; then
-  export $(grep -v '^#' /app/.env | xargs)
+  set -a
+  . /app/.env
+  set +a
 fi
 
 echo "Waiting for database..."
 max_retries=30
 retry_count=0
 
-until alembic current 2>/dev/null || [ $retry_count -eq $max_retries ]; do
+until PGPASSWORD=postgres psql -h db -U postgres -d bolmate_base -c '\q' 2>/dev/null || [ $retry_count -eq $max_retries ]; do
   echo "Database not ready yet, retrying in 2 seconds... ($retry_count/$max_retries)"
   sleep 2
   retry_count=$((retry_count + 1))
