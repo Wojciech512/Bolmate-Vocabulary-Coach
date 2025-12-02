@@ -13,11 +13,11 @@ RUN apt-get update && \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY entrypoint.sh /entrypoint.sh
+RUN dos2unix /entrypoint.sh && chmod +x /entrypoint.sh
 
-RUN dos2unix /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
+COPY . .
 
 ENV FLASK_APP=wsgi.py
 
-ENTRYPOINT ["/app/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]

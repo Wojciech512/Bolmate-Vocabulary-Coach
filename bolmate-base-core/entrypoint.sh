@@ -29,4 +29,4 @@ if [ -z "$authenticated_url" ]; then
 fi
 alembic upgrade head
 
-exec flask --app wsgi run --host=0.0.0.0 --port=5000
+exec flask --app wsgi run --host=0.0.0.0 --port=5000 --reload --debug
