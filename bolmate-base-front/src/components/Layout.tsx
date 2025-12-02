@@ -16,14 +16,43 @@ function Layout({ children }: LayoutProps) {
   ];
 
   return (
-    <Box display="flex" flexDirection="column" minHeight="100vh" bgcolor="background.default">
-      <AppBar position="static" color="primary" enableColorOnDark>
+    <Box
+      display="flex"
+      flexDirection="column"
+      minHeight="100vh"
+      bgcolor="background.default"
+    >
+      <AppBar position="static" sx={{ bgcolor: "white" }}>
         <Toolbar sx={{ gap: 2 }}>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Bolmate Coach
-          </Typography>
+          <Box sx={{ position: "relative", display: "inline-block" }}>
+            <Box
+              component="img"
+              src="/assets/bolmate-logo.png"
+              alt="Bolmate Logo"
+              sx={{ height: 40, width: "auto", display: "block" }}
+            />
+            <Typography
+              variant="caption"
+              sx={{
+                position: "absolute",
+                bottom: -10,
+                right: -50,
+                fontFamily: "'Brush Script MT', 'Segoe Script', cursive",
+                fontStyle: "italic",
+                transform: "rotate(-15deg)",
+                fontWeight: 500,
+                fontSize: "1.65rem",
+                color: "#df00ff",
+              }}
+            >
+              Vocabulary
+            </Typography>
+          </Box>
+          <Box sx={{ flexGrow: 1 }} />
           {navItems.map((item) => {
-            const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + "/");
+            const isActive =
+              location.pathname === item.path ||
+              location.pathname.startsWith(item.path + "/");
             return (
               <Button
                 key={item.path}
@@ -34,6 +63,7 @@ function Layout({ children }: LayoutProps) {
                 sx={{
                   textTransform: "none",
                   fontWeight: isActive ? 700 : 500,
+                  color: isActive ? undefined : "#0A1B33",
                 }}
               >
                 {item.label}
