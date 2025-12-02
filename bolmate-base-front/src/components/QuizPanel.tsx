@@ -17,11 +17,17 @@ type QuizState = {
   translated_word: string;
 };
 
+type HintData = {
+  hint?: string;
+  example_sentence?: string;
+  example_translation?: string;
+};
+
 export default function QuizPanel() {
   const [question, setQuestion] = useState<QuizState | null>(null);
   const [answer, setAnswer] = useState("");
   const [feedback, setFeedback] = useState<string | null>(null);
-  const [hint, setHint] = useState<any>(null);
+  const [hint, setHint] = useState<HintData | null>(null);
   const [loading, setLoading] = useState(false);
 
   const loadQuestion = async () => {
@@ -31,8 +37,11 @@ export default function QuizPanel() {
     try {
       const res = await getQuizQuestion();
       setQuestion(res.data);
-    } catch (err: any) {
-      setFeedback(err?.response?.data?.error || "No questions available");
+    } catch (err: unknown) {
+      const errorMessage = err && typeof err === 'object' && 'response' in err
+        ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
+        : undefined;
+      setFeedback(errorMessage || "No questions available");
     }
   };
 
@@ -59,8 +68,11 @@ export default function QuizPanel() {
         example_sentence: res.data.example_sentence,
         example_translation: res.data.example_translation,
       });
-    } catch (err: any) {
-      setFeedback(err?.response?.data?.error || "Failed to submit answer");
+    } catch (err: unknown) {
+      const errorMessage = err && typeof err === 'object' && 'response' in err
+        ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
+        : undefined;
+      setFeedback(errorMessage || "Failed to submit answer");
     } finally {
       setLoading(false);
     }

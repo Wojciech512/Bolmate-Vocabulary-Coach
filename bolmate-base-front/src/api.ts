@@ -14,8 +14,6 @@ export type CreateFlashcardInput = {
   source_language?: string;
 };
 
-// TODO nieużywanie typu "any" projekt ma być silnie typowany - zweryfikować rzutowanie na typy
-// TODO do weryfikacji typy - nie może być any
 // TODO selektor języka na który mają być wykonywane tłumaczenia - przy zmianie języka w aplikacji wszystkie obecne fiszki zostają przetłumaczone na wybrany język
 // TODO opisy aplikacji że jest uniwersalna dla każdego języka
 // TODO interpretowanie danych z plików tekstowych (.pdf, .docx itd.), zdjęciowych w Interpret (OCR & AI)
@@ -31,7 +29,13 @@ export const deleteFlashcard = (id: number) => api.delete(`/api/flashcards/${id}
 export const submitQuizAnswer = (payload: { flashcard_id: number; answer: string }) =>
   api.post("/api/quiz", payload);
 export const getQuizQuestion = () => api.get("/api/quiz");
-export const generateQuiz = (payload: any) => api.post("/api/quiz/generate", payload);
+export type GenerateQuizPayload = {
+  num_questions?: number;
+  flashcard_ids?: number[];
+};
+
+export const generateQuiz = (payload: GenerateQuizPayload) =>
+  api.post("/api/quiz/generate", payload);
 export const interpretText = (text: string, native_language: string) =>
   api.post("/api/interpret", { text, native_language });
 export const fetchLanguages = () => api.get("/api/languages");

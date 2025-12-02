@@ -18,10 +18,19 @@ import { useState } from "react";
 import { interpretText, createFlashcard } from "../api";
 import { useLanguage } from "../context/LanguageContext";
 
+type InterpretedItem = {
+  source_word: string;
+  translated_word: string;
+  native_language?: string;
+  source_language?: string;
+  example_sentence?: string;
+  example_sentence_translated?: string;
+};
+
 export default function InterpretForm() {
   const { nativeLanguage } = useLanguage();
   const [input, setInput] = useState("");
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<InterpretedItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [addingIds, setAddingIds] = useState<Set<number>>(new Set());
@@ -35,14 +44,17 @@ export default function InterpretForm() {
     try {
       const res = await interpretText(input, nativeLanguage);
       setResults(res.data.items || []);
-    } catch (err: any) {
-      setError(err?.response?.data?.error || "Interpretation failed");
+    } catch (err: unknown) {
+      const errorMessage = err && typeof err === 'object' && 'response' in err
+        ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
+        : undefined;
+      setError(errorMessage || "Interpretation failed");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAddFlashcard = async (item: any, index: number) => {
+  const handleAddFlashcard = async (item: InterpretedItem, index: number) => {
     setAddingIds((prev) => new Set(prev).add(index));
     setError(null);
     try {
@@ -53,8 +65,11 @@ export default function InterpretForm() {
         source_language: item.source_language || "es",
       });
       setAddedIds((prev) => new Set(prev).add(index));
-    } catch (err: any) {
-      setError(err?.response?.data?.error || "Failed to add flashcard");
+    } catch (err: unknown) {
+      const errorMessage = err && typeof err === 'object' && 'response' in err
+        ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
+        : undefined;
+      setError(errorMessage || "Failed to add flashcard");
     } finally {
       setAddingIds((prev) => {
         const newSet = new Set(prev);
@@ -79,8 +94,11 @@ export default function InterpretForm() {
           setAddedIds((prev) => new Set(prev).add(i));
         }
       }
-    } catch (err: any) {
-      setError(err?.response?.data?.error || "Failed to add all flashcards");
+    } catch (err: unknown) {
+      const errorMessage = err && typeof err === 'object' && 'response' in err
+        ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
+        : undefined;
+      setError(errorMessage || "Failed to add all flashcards");
     } finally {
       setAddingAll(false);
     }
