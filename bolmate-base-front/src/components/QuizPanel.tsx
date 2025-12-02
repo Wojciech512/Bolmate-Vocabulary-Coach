@@ -7,6 +7,7 @@ import {
   Stack,
   Switch,
   TextField,
+  Tooltip,
   Typography,
   CircularProgress,
 } from "@mui/material";
@@ -32,11 +33,13 @@ export default function QuizPanel() {
   const [loading, setLoading] = useState(false);
   const [loadingQuestion, setLoadingQuestion] = useState(false);
   const [reverseMode, setReverseMode] = useState(false);
+  const [lastSubmittedAnswer, setLastSubmittedAnswer] = useState("");
 
   const loadQuestion = async () => {
     setFeedback(null);
     setHint(null);
     setAnswer("");
+    setLastSubmittedAnswer("");
     setLoadingQuestion(true);
     try {
       const res = await getQuizQuestion(reverseMode, nativeLanguage);
@@ -66,6 +69,7 @@ export default function QuizPanel() {
         flashcard_id: question.flashcard_id,
         answer,
       }, reverseMode);
+      setLastSubmittedAnswer(answer);
       setFeedback(
         res.data.correct
           ? "Correct!"
@@ -139,14 +143,25 @@ export default function QuizPanel() {
               fullWidth
             />
             <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
-              <StyledButton
-                type="submit"
-                variant="primary"
-                disabled={loading}
-                sx={{ minWidth: 140 }}
+              <Tooltip
+                title={
+                  feedback && answer === lastSubmittedAnswer
+                    ? "Change your answer to check again"
+                    : ""
+                }
+                arrow
               >
-                {loading ? "Checking..." : "Check"}
-              </StyledButton>
+                <span>
+                  <StyledButton
+                    type="submit"
+                    variant="primary"
+                    disabled={loading || (feedback !== null && answer === lastSubmittedAnswer)}
+                    sx={{ minWidth: 140 }}
+                  >
+                    {loading ? "Checking..." : "Check"}
+                  </StyledButton>
+                </span>
+              </Tooltip>
               <StyledButton
                 variant="outlined"
                 onClick={loadQuestion}

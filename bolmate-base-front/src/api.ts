@@ -161,7 +161,6 @@ export type BulkCreateFlashcardsResponse = {
 };
 // TODO healthchecks dla serwisów
 // TODO optymalizacja zapytań do AI żeby mniej płacić
-// TODO gdy pierwsze słowa w liście przesłanej do AI są w języku wybranym w targetowanym języku to nie tworzą się listy
 // TODO aktualizacja dokumentacji
 // TODO przy dodawaniu bardzo dużo requestów jest wykonywanych należy to dostosować
 // TODO dodać weryfikacje powtarzających się aagadnień za pomocą AI
