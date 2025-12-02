@@ -21,4 +21,4 @@ class QuizItem(Base):
     flashcard_id = Column(Integer, ForeignKey("flashcards.id"), nullable=False)
     user_answer = Column(String(512), nullable=True)
     is_correct = Column(Boolean, nullable=True)
-    metadata = Column(JSON, nullable=True)
+    item_metadata = Column(JSON, nullable=True)
