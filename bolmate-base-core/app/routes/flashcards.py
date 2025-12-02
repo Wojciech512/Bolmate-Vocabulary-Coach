@@ -1,9 +1,11 @@
 from flask import Blueprint, jsonify, request
+from pydantic import ValidationError
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import func
 
 from app.db.session import SessionLocal
 from app.models import Flashcard
+from app.schemas.flashcard import CreateFlashcardRequest, EnrichFlashcardsRequest
 from app.services.openai_service import enrich_flashcards
 from config import get_settings
 
@@ -46,14 +48,16 @@ def list_flashcards():
 
 @flashcards_bp.post("/flashcards")
 def create_flashcard():
-    payload = request.get_json(silent=True) or {}
-    source_word = (payload.get("source_word") or "").strip()
-    translated_word = (payload.get("translated_word") or "").strip()
-    native_language = (payload.get("native_language") or get_settings().default_native_language).strip()
-    source_language = (payload.get("source_language") or "es").strip() or "es"
+    try:
+        payload = request.get_json(silent=True) or {}
+        data = CreateFlashcardRequest(**payload)
+    except ValidationError as e:
+        return jsonify({"error": "Invalid request data", "details": e.errors()}), 400
 
-    if not source_word or not translated_word:
-        return jsonify({"error": "source_word and translated_word are required."}), 400
+    source_word = data.source_word.strip()
+    translated_word = data.translated_word.strip()
+    native_language = (data.native_language or get_settings().default_native_language).strip()
+    source_language = (data.source_language or "es").strip() or "es"
 
     session = SessionLocal()
     try:
@@ -62,10 +66,10 @@ def create_flashcard():
             translated_word=translated_word,
             native_language=native_language,
             source_language=source_language,
-            is_manual=payload.get("is_manual", True),
-            difficulty_level=payload.get("difficulty_level"),
-            example_sentence=payload.get("example_sentence"),
-            example_sentence_translated=payload.get("example_sentence_translated"),
+            is_manual=data.is_manual if data.is_manual is not None else True,
+            difficulty_level=data.difficulty_level,
+            example_sentence=data.example_sentence,
+            example_sentence_translated=data.example_sentence_translated,
         )
         session.add(card)
         session.commit()
@@ -137,19 +141,23 @@ def delete_flashcard(card_id: int):
 
 @flashcards_bp.post("/flashcards/enrich")
 def enrich_existing_flashcards():
-    payload = request.get_json(silent=True) or {}
-    card_ids = payload.get("ids", [])
-    native_language = payload.get("native_language") or get_settings().default_native_language
+    try:
+        payload = request.get_json(silent=True) or {}
+        data = EnrichFlashcardsRequest(**payload)
+    except ValidationError as e:
+        return jsonify({"error": "Invalid request data", "details": e.errors()}), 400
+
+    native_language = data.native_language or get_settings().default_native_language
     session = SessionLocal()
     try:
-        cards = session.query(Flashcard).filter(Flashcard.id.in_(card_ids)).all()
+        cards = session.query(Flashcard).filter(Flashcard.id.in_(data.ids)).all()
         if not cards:
             return jsonify({"error": "No flashcards found"}), 404
         enriched = enrich_flashcards([_serialize_flashcard(c) for c in cards], native_language)
-        for card, data in zip(cards, enriched):
-            card.example_sentence = data.get("example_sentence") or card.example_sentence
-            card.example_sentence_translated = data.get("example_translation") or card.example_sentence_translated
-            card.difficulty_level = data.get("difficulty_level") or card.difficulty_level
+        for card, enrich_data in zip(cards, enriched):
+            card.example_sentence = enrich_data.get("example_sentence") or card.example_sentence
+            card.example_sentence_translated = enrich_data.get("example_translation") or card.example_sentence_translated
+            card.difficulty_level = enrich_data.get("difficulty_level") or card.difficulty_level
         session.commit()
         return jsonify([_serialize_flashcard(c) for c in cards])
     finally:
