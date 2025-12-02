@@ -1,4 +1,12 @@
-import { Card, CardActions, CardContent, Grid, Button, Typography, Box } from "@mui/material";
+import {
+  Card,
+  CardActions,
+  CardContent,
+  Grid,
+  Button,
+  Typography,
+  Box,
+} from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 
 function HomePage() {
@@ -8,8 +16,9 @@ function HomePage() {
         Bolmate Vocabulary Coach
       </Typography>
       <Typography variant="body1" color="text.secondary" gutterBottom>
-        Add Spanish (or any language) words from your notebook, practice them daily in a fast Q&A flow,
-        and get AI-powered hints, examples, and OCR/interpretation support.
+        Add Spanish (or any language) words from your notebook, practice them daily in a
+        fast Q&A flow, and get AI-powered hints, examples, and OCR/interpretation
+        support.
       </Typography>
       <Grid container spacing={2} sx={{ mt: 1 }}>
         <Grid item xs={12} md={4}>
@@ -23,7 +32,12 @@ function HomePage() {
               </Typography>
             </CardContent>
             <CardActions sx={{ px: 2, pb: 2 }}>
-              <Button component={RouterLink} to="/flashcards" variant="contained" fullWidth>
+              <Button
+                component={RouterLink}
+                to="/flashcards"
+                variant="contained"
+                fullWidth
+              >
                 Go to Flashcards
               </Button>
             </CardActions>
@@ -36,7 +50,8 @@ function HomePage() {
                 Practice
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                One-word quiz loop with instant correctness check and AI hints when you miss.
+                One-word quiz loop with instant correctness check and AI hints when you
+                miss.
               </Typography>
             </CardContent>
             <CardActions sx={{ px: 2, pb: 2 }}>
@@ -53,11 +68,17 @@ function HomePage() {
                 Interpret
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Paste notebook text or upload files to extract vocabulary with translations.
+                Paste notebook text or upload files to extract vocabulary with
+                translations.
               </Typography>
             </CardContent>
             <CardActions sx={{ px: 2, pb: 2 }}>
-              <Button component={RouterLink} to="/interpret" variant="contained" fullWidth>
+              <Button
+                component={RouterLink}
+                to="/interpret"
+                variant="contained"
+                fullWidth
+              >
                 Try Interpret
               </Button>
             </CardActions>

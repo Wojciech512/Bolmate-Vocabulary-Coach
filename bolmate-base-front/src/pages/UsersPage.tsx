@@ -145,11 +145,20 @@ function UsersPage() {
                         primary={user.name}
                         secondary={
                           <>
-                            <Typography component="span" variant="body2" color="text.secondary">
+                            <Typography
+                              component="span"
+                              variant="body2"
+                              color="text.secondary"
+                            >
                               {user.email}
                             </Typography>
                             {user.created_at && (
-                              <Typography component="span" variant="caption" color="text.secondary" display="block">
+                              <Typography
+                                component="span"
+                                variant="caption"
+                                color="text.secondary"
+                                display="block"
+                              >
                                 {new Date(user.created_at).toLocaleString()}
                               </Typography>
                             )}

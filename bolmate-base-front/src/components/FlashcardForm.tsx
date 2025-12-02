@@ -1,4 +1,13 @@
-import { Alert, Button, Card, CardActions, CardContent, Stack, TextField, Typography } from "@mui/material";
+import {
+  Alert,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useState } from "react";
 import { createFlashcard } from "../api";
 import { useLanguage } from "../context/LanguageContext";
@@ -18,8 +27,8 @@ export default function FlashcardForm({ onCreated }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!sourceWord || !translation) {
-        setError("Spanish word and translation are required");
-        return;
+      setError("Spanish word and translation are required");
+      return;
     }
     setLoading(true);
     setError(null);
@@ -85,4 +94,3 @@ export default function FlashcardForm({ onCreated }: Props) {
     </Card>
   );
 }
-

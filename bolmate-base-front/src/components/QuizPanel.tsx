@@ -1,4 +1,13 @@
-import { Alert, Box, Button, Card, CardContent, Stack, TextField, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import { getQuizQuestion, submitQuizAnswer } from "../api";
 
@@ -36,8 +45,15 @@ export default function QuizPanel() {
     if (!question) return;
     setLoading(true);
     try {
-      const res = await submitQuizAnswer({ flashcard_id: question.flashcard_id, answer });
-      setFeedback(res.data.correct ? "Correct!" : `Incorrect. Correct answer: ${res.data.correctAnswer}`);
+      const res = await submitQuizAnswer({
+        flashcard_id: question.flashcard_id,
+        answer,
+      });
+      setFeedback(
+        res.data.correct
+          ? "Correct!"
+          : `Incorrect. Correct answer: ${res.data.correctAnswer}`,
+      );
       setHint({
         hint: res.data.hint,
         example_sentence: res.data.example_sentence,
@@ -62,7 +78,11 @@ export default function QuizPanel() {
           </Typography>
         )}
         {question && (
-          <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+          >
             <Box>
               <Typography variant="caption" color="text.secondary">
                 Translate this word
@@ -79,10 +99,20 @@ export default function QuizPanel() {
               fullWidth
             />
             <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
-              <Button type="submit" variant="contained" disabled={loading} sx={{ minWidth: 140 }}>
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={loading}
+                sx={{ minWidth: 140 }}
+              >
                 {loading ? "Checking..." : "Check"}
               </Button>
-              <Button variant="outlined" color="secondary" onClick={loadQuestion} sx={{ minWidth: 140 }}>
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={loadQuestion}
+                sx={{ minWidth: 140 }}
+              >
                 Next word
               </Button>
             </Stack>
@@ -90,7 +120,10 @@ export default function QuizPanel() {
         )}
 
         {feedback && (
-          <Alert severity={feedback.startsWith("Correct") ? "success" : "warning"} sx={{ mt: 2 }}>
+          <Alert
+            severity={feedback.startsWith("Correct") ? "success" : "warning"}
+            sx={{ mt: 2 }}
+          >
             {feedback}
           </Alert>
         )}
@@ -114,4 +147,3 @@ export default function QuizPanel() {
     </Card>
   );
 }
-
