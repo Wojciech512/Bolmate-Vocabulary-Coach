@@ -71,7 +71,16 @@ def switch_language():
 
         cards = query.order_by(Flashcard.id.asc()).all()
         if not cards:
-            return jsonify({"error": "No flashcards found"}), 404
+            # No flashcards yet - return empty success response
+            return jsonify({
+                "flashcards": [],
+                "meta": {
+                    "target_language": data.target_language,
+                    "translated_count": 0,
+                    "skipped_count": 0,
+                    "force_retranslate": data.force_retranslate,
+                }
+            }), 200
 
         to_translate = [
             card

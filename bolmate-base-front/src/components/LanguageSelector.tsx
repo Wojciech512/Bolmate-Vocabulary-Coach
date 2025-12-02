@@ -31,12 +31,25 @@ const LanguageSelector = () => {
     try {
       const response = await switchToLanguage(newLang);
       if (response) {
-        setStatus(
-          `Translated ${response.meta.translated_count} flashcard${response.meta.translated_count !== 1 ? 's' : ''} (skipped ${response.meta.skipped_count}).`,
-        );
+        if (response.meta.translated_count === 0 && response.meta.skipped_count === 0) {
+          setStatus("Language switched. No flashcards to translate yet.");
+        } else {
+          setStatus(
+            `Translated ${response.meta.translated_count} flashcard${response.meta.translated_count !== 1 ? 's' : ''} (skipped ${response.meta.skipped_count}).`,
+          );
+        }
+      } else {
+        // Language was already selected or no change needed
+        setStatus("Language updated.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Language switch failed", error);
+      const errorMsg = error?.response?.data?.error;
+      if (errorMsg && errorMsg.includes("No flashcards")) {
+        setStatus("Language switched. Add flashcards to translate them.");
+        // Still update the language even if no flashcards exist
+        return;
+      }
       setStatus("Failed to switch language. Please try again.");
       setSelected(nativeLanguage);
     }
