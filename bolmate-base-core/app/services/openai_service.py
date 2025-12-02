@@ -37,13 +37,13 @@ def generate_hint_for_flashcard(
         f"meaning '{translated_word}'. Respond as JSON with keys hint, example_sentence, example_translation."
     )
     try:
-        response = client.responses.create(
+        response = client.chat.completions.create(
             model=settings.openai_model,
             temperature=settings.openai_temperature,
-            input=[{"role": "user", "content": prompt}],
+            messages=[{"role": "user", "content": prompt}],
             response_format={"type": "json_object"},
         )
-        message = response.output[0].content[0].text
+        message = response.choices[0].message.content
         return message and _safe_parse_json(message) or {}
     except Exception as exc:  # pragma: no cover - external dependency
         logger.exception("Failed to generate hint: %s", exc)
@@ -60,10 +60,10 @@ def enrich_flashcards(words: List[Dict[str, Any]], native_language: str) -> List
         "and difficulty_level (A1/A2/B1). Return JSON array in same order with the new fields merged."
     )
     try:
-        response = client.responses.create(
+        response = client.chat.completions.create(
             model=settings.openai_model,
             temperature=settings.openai_temperature,
-            input=[
+            messages=[
                 {"role": "system", "content": prompt},
                 {
                     "role": "user",
@@ -72,7 +72,7 @@ def enrich_flashcards(words: List[Dict[str, Any]], native_language: str) -> List
             ],
             response_format={"type": "json_object"},
         )
-        message = response.output[0].content[0].text
+        message = response.choices[0].message.content
         parsed = _safe_parse_json(message)
         return parsed.get("items", words) if isinstance(parsed, dict) else words
     except Exception as exc:  # pragma: no cover
@@ -90,16 +90,16 @@ def generate_quiz_questions(cards: List[Dict[str, Any]], num_questions: int) -> 
         "Return JSON with an array 'questions' where each item has question, type, answer and optional options."
     )
     try:
-        response = client.responses.create(
+        response = client.chat.completions.create(
             model=settings.openai_model,
             temperature=settings.openai_temperature,
-            input=[
+            messages=[
                 {"role": "system", "content": prompt},
                 {"role": "user", "content": f"Use these flashcards: {cards[:num_questions]}"},
             ],
             response_format={"type": "json_object"},
         )
-        message = response.output[0].content[0].text
+        message = response.choices[0].message.content
         parsed = _safe_parse_json(message)
         if isinstance(parsed, dict) and isinstance(parsed.get("questions"), list):
             return parsed["questions"][:num_questions]
@@ -118,16 +118,16 @@ def interpret_text_with_ai(text: str, native_language: str) -> List[Dict[str, An
         f"into {native_language}. Respond as JSON with array 'items' of objects: source_word, source_language, translated_word, native_language."
     )
     try:
-        response = client.responses.create(
+        response = client.chat.completions.create(
             model=settings.openai_model,
             temperature=settings.openai_temperature,
-            input=[
+            messages=[
                 {"role": "system", "content": prompt},
                 {"role": "user", "content": text},
             ],
             response_format={"type": "json_object"},
         )
-        message = response.output[0].content[0].text
+        message = response.choices[0].message.content
         parsed = _safe_parse_json(message)
         return parsed.get("items", []) if isinstance(parsed, dict) else []
     except Exception as exc:  # pragma: no cover
