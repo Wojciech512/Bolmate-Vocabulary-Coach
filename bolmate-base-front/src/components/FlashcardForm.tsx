@@ -7,10 +7,16 @@ import {
   Stack,
   TextField,
   Typography,
+  Box,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
-import { useState } from "react";
-import { createFlashcard } from "../api";
+import { useState, useEffect } from "react";
+import { createFlashcard, fetchLanguages, type Language } from "../api";
 import { useLanguage } from "../context/LanguageContext";
+import LanguageIcon from "@mui/icons-material/Language";
 
 type Props = {
   onCreated: () => void;
@@ -23,6 +29,13 @@ export default function FlashcardForm({ onCreated }: Props) {
   const [sourceLanguage, setSourceLanguage] = useState("es");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [languages, setLanguages] = useState<Language[]>([]);
+
+  useEffect(() => {
+    fetchLanguages()
+      .then((res) => setLanguages(res.data.languages))
+      .catch(() => setLanguages([]));
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,14 +75,33 @@ export default function FlashcardForm({ onCreated }: Props) {
           Add a new word
         </Typography>
         <Stack spacing={2}>
-          <TextField
-            label="Source word"
-            value={sourceWord}
-            onChange={(e) => setSourceWord(e.target.value)}
-            required
-            error={hasFieldError && !sourceWord}
-            helperText={hasFieldError && !sourceWord ? "Source word is required" : ""}
-          />
+          <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+            <TextField
+              label="Source word"
+              value={sourceWord}
+              onChange={(e) => setSourceWord(e.target.value)}
+              required
+              error={hasFieldError && !sourceWord}
+              helperText={hasFieldError && !sourceWord ? "Source word is required" : ""}
+              sx={{ flex: 1 }}
+            />
+            <LanguageIcon color="action" />
+            <FormControl sx={{ width: "150px" }}>
+              <InputLabel id="source-language-label">Source language</InputLabel>
+              <Select
+                labelId="source-language-label"
+                label="Source language"
+                value={sourceLanguage}
+                onChange={(e) => setSourceLanguage(e.target.value)}
+              >
+                {languages.map((lang) => (
+                  <MenuItem key={lang.code} value={lang.code}>
+                    {lang.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
           <TextField
             label={`Translation (${nativeLanguage.toUpperCase()})`}
             value={translation}
@@ -78,11 +110,7 @@ export default function FlashcardForm({ onCreated }: Props) {
             error={hasFieldError && !translation}
             helperText={hasFieldError && !translation ? "Translation is required" : ""}
           />
-          <TextField
-            label="Source language"
-            value={sourceLanguage}
-            onChange={(e) => setSourceLanguage(e.target.value)}
-          />
+
           {error && sourceWord && translation && (
             <Alert severity="error" variant="outlined">
               {error}
