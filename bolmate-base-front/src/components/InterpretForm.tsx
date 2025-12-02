@@ -39,6 +39,7 @@ import {
   interpretText,
   interpretFile,
   createFlashcard,
+  bulkCreateFlashcards,
   type InterpretedItem,
 } from "../api";
 import { useLanguage } from "../context/LanguageContext";
@@ -175,18 +176,37 @@ export default function InterpretForm() {
     setError(null);
     try {
       const toAdd = results.filter((_, i) => !addedIds.has(i));
-      for (let i = 0; i < results.length; i++) {
-        if (!addedIds.has(i)) {
-          await createFlashcard({
-            source_word: results[i].source_word,
-            translated_word: results[i].translated_word,
-            native_language: results[i].native_language || nativeLanguage,
-            source_language: results[i].source_language || "es",
-          });
-          setAddedIds((prev) => new Set(prev).add(i));
-        }
+
+      if (toAdd.length === 0) {
+        showSuccess("All flashcards already added");
+        return;
       }
-      showSuccess(`Added ${toAdd.length} flashcards successfully`);
+
+      // Use bulk endpoint - single request instead of N requests
+      const flashcardsToCreate = toAdd.map((item) => ({
+        source_word: item.source_word,
+        translated_word: item.translated_word,
+        native_language: item.native_language || nativeLanguage,
+        source_language: item.source_language || "es",
+      }));
+
+      const response = await bulkCreateFlashcards({ flashcards: flashcardsToCreate });
+
+      // Mark all as added
+      const newAddedIds = new Set(addedIds);
+      results.forEach((item, idx) => {
+        if (!addedIds.has(idx)) {
+          newAddedIds.add(idx);
+        }
+      });
+      setAddedIds(newAddedIds);
+
+      const message =
+        response.data.skipped_count > 0
+          ? `Added ${response.data.created_count} flashcards (${response.data.skipped_count} duplicates skipped)`
+          : `Added ${response.data.created_count} flashcards successfully`;
+
+      showSuccess(message);
     } catch {
       // Error is handled by global interceptor
       setError("Failed to add all flashcards");

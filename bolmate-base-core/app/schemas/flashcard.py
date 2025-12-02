@@ -44,3 +44,9 @@ class EnrichFlashcardsRequest(BaseModel):
 
     ids: list[int] = Field(..., min_length=1)
     native_language: Optional[str] = Field(None, max_length=10)
+
+
+class BulkCreateFlashcardsRequest(BaseModel):
+    """Request schema for bulk creating flashcards."""
+
+    flashcards: list[CreateFlashcardRequest] = Field(..., min_length=1)

@@ -5,7 +5,11 @@ from sqlalchemy.exc import IntegrityError
 
 from app.db.session import SessionLocal
 from app.models import Flashcard
-from app.schemas.flashcard import CreateFlashcardRequest, EnrichFlashcardsRequest
+from app.schemas.flashcard import (
+    CreateFlashcardRequest,
+    EnrichFlashcardsRequest,
+    BulkCreateFlashcardsRequest,
+)
 from app.services.openai_service import enrich_flashcards
 from config import get_settings
 
@@ -145,6 +149,89 @@ def delete_flashcard(card_id: int):
         session.delete(card)
         session.commit()
         return jsonify({"status": "deleted"})
+    finally:
+        session.close()
+
+
+@flashcards_bp.post("/flashcards/bulk")
+def bulk_create_flashcards():
+    """Create multiple flashcards in a single request."""
+    try:
+        payload = request.get_json(silent=True) or {}
+        data = BulkCreateFlashcardsRequest(**payload)
+    except ValidationError as e:
+        return jsonify({"error": "Invalid request data", "details": e.errors()}), 400
+
+    session = SessionLocal()
+    created_cards = []
+    skipped_count = 0
+    error_details = []
+
+    try:
+        for item in data.flashcards:
+            source_word = item.source_word.strip()
+            translated_word = item.translated_word.strip()
+            native_language = (
+                item.native_language or get_settings().default_native_language
+            ).strip()
+            source_language = (item.source_language or "es").strip() or "es"
+
+            # Check if flashcard already exists
+            existing = (
+                session.query(Flashcard)
+                .filter(
+                    func.lower(Flashcard.source_word) == source_word.lower(),
+                    func.lower(Flashcard.translated_word) == translated_word.lower(),
+                    func.lower(Flashcard.native_language) == native_language.lower(),
+                    func.lower(Flashcard.source_language) == source_language.lower(),
+                )
+                .first()
+            )
+
+            if existing:
+                skipped_count += 1
+                error_details.append(
+                    f"Skipped duplicate: {source_word} ({source_language})"
+                )
+                continue
+
+            try:
+                card = Flashcard(
+                    source_word=source_word,
+                    translated_word=translated_word,
+                    native_language=native_language,
+                    source_language=source_language,
+                    is_manual=item.is_manual if item.is_manual is not None else False,
+                    difficulty_level=item.difficulty_level,
+                    example_sentence=item.example_sentence,
+                    example_sentence_translated=item.example_sentence_translated,
+                )
+                session.add(card)
+                session.flush()
+                created_cards.append(_serialize_flashcard(card))
+            except IntegrityError:
+                session.rollback()
+                skipped_count += 1
+                error_details.append(
+                    f"Integrity error: {source_word} ({source_language})"
+                )
+                continue
+
+        session.commit()
+        return (
+            jsonify(
+                {
+                    "created": created_cards,
+                    "created_count": len(created_cards),
+                    "skipped_count": skipped_count,
+                    "error_details": error_details if error_details else None,
+                }
+            ),
+            201,
+        )
+    except Exception as e:
+        session.rollback()
+        return jsonify({"error": f"Bulk creation failed: {str(e)}"}), 500
     finally:
         session.close()
 

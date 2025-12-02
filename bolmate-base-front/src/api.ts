@@ -148,9 +148,19 @@ export type SwitchLanguageResponse = {
 export type DeleteResponse = {
   status: string;
 };
+
+export type BulkCreateFlashcardsPayload = {
+  flashcards: CreateFlashcardInput[];
+};
+
+export type BulkCreateFlashcardsResponse = {
+  created: Flashcard[];
+  created_count: number;
+  skipped_count: number;
+  error_details?: string[];
+};
 // TODO healthchecks dla serwisów
 // TODO ustandaryzowanie przycisków i wyglądu linków w aplikacji
-// TODO filtrowanie w tabelach
 // TODO aktualizacja dokumentacji
 // TODO przy dodawaniu bardzo dużo requestów jest wykonywanych należy to dostosować
 // TODO dodać weryfikacje powtarzających się aagadnień za pomocą AI
@@ -163,6 +173,9 @@ export const fetchFlashcards = () => api.get<Flashcard[]>("/api/flashcards");
 
 export const createFlashcard = (data: CreateFlashcardInput) =>
   api.post<Flashcard>("/api/flashcards", data);
+
+export const bulkCreateFlashcards = (payload: BulkCreateFlashcardsPayload) =>
+  api.post<BulkCreateFlashcardsResponse>("/api/flashcards/bulk", payload);
 
 export const deleteFlashcard = (id: number) =>
   api.delete<DeleteResponse>(`/api/flashcards/${id}`);
