@@ -95,7 +95,7 @@ export default function QuizPanel() {
           >
             <Box>
               <Typography variant="caption" color="text.secondary">
-                Translate this word
+                Translate from {question.source_language}
               </Typography>
               <Typography variant="h4" fontWeight={700} mt={0.5}>
                 {question.source_word}
