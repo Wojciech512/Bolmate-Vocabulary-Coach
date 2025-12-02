@@ -12,7 +12,9 @@ export default function FlashcardsPage() {
 
   const loadFlashcards = async () => {
     const res = await fetchFlashcards();
-    setFlashcards(res.data);
+    setFlashcards(
+      res.data.map((fc) => ({ ...fc, created_at: fc.created_at ?? undefined })),
+    );
   };
 
   useEffect(() => {

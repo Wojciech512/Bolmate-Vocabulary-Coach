@@ -16,7 +16,14 @@ import {
   Stack,
   Tooltip,
   Alert,
+  Box,
+  TablePagination,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
+import { useState } from "react";
 import { Flashcard } from "../types";
 import { deleteFlashcard } from "../api";
 
@@ -26,10 +33,30 @@ type Props = {
 };
 
 export default function FlashcardList({ flashcards, onDeleted }: Props) {
+  const minPerPage = Number(import.meta.env.VITE_FLASHCARDS_MIN_PER_PAGE) || 5;
+  const maxPerPage = Number(import.meta.env.VITE_FLASHCARDS_MAX_PER_PAGE) || 50;
+
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
   const handleDelete = async (id: number) => {
     await deleteFlashcard(id);
     onDeleted();
   };
+
+  const handleChangePage = (_event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const paginatedFlashcards = flashcards.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
 
   return (
     <Card variant="outlined">
@@ -56,7 +83,7 @@ export default function FlashcardList({ flashcards, onDeleted }: Props) {
                 </TableCell>
               </TableRow>
             ) : (
-              flashcards.map((card) => (
+              paginatedFlashcards.map((card) => (
                 <TableRow key={card.id} hover>
                   <TableCell width="20%">
                     <Stack spacing={0.5}>
@@ -119,6 +146,42 @@ export default function FlashcardList({ flashcards, onDeleted }: Props) {
             )}
           </TableBody>
         </Table>
+        {flashcards.length > 0 && (
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
+            <FormControl size="small" sx={{ minWidth: 120 }}>
+              <InputLabel>Words per page</InputLabel>
+              <Select
+                value={rowsPerPage}
+                label="Words per page"
+                onChange={(e) => {
+                  setRowsPerPage(Number(e.target.value));
+                  setPage(0);
+                }}
+              >
+                {Array.from(
+                  { length: Math.floor((maxPerPage - minPerPage) / 5) + 1 },
+                  (_, i) => minPerPage + i * 5
+                ).map((value) => (
+                  <MenuItem key={value} value={value}>
+                    {value}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <TablePagination
+              component="div"
+              count={flashcards.length}
+              page={page}
+              onPageChange={handleChangePage}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              rowsPerPageOptions={[]}
+              labelDisplayedRows={({ from, to, count }) =>
+                `${from}-${to} of ${count}`
+              }
+            />
+          </Box>
+        )}
       </CardContent>
     </Card>
   );

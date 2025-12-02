@@ -136,8 +136,6 @@ export type DeleteResponse = {
 // TODO sprawdzanie duplikatów i agregowanie podobnych słów
 // TODO paginacja w flashcards
 // TODO rozróżnienie zwrotów od pojedyńczych słów
-// TODO selektor języka na który mają być wykonywane tłumaczenia - przy zmianie języka w aplikacji wszystkie obecne fiszki zostają przetłumaczone na wybrany język
-// TODO opisy aplikacji że jest uniwersalna dla każdego języka
 // TODO interpretowanie danych z plików tekstowych (.pdf, .docx itd.), zdjęciowych w Interpret (OCR & AI)
 // TODO skopiowanie przycisków z https://bolmate.nl/
 // TODO quiz w postaci obracanych kart (animacje)
