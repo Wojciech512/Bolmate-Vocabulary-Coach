@@ -69,6 +69,9 @@ export default function FlashcardList({ flashcards, onDeleted }: Props) {
                   <TableCell width="40%">
                     <Stack spacing={0.5}>
                       <Typography>{card.translated_word}</Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {card.native_language.toUpperCase()}
+                      </Typography>
                       {card.example_sentence && (
                         <Typography variant="body2" color="text.secondary">
                           {card.example_sentence}

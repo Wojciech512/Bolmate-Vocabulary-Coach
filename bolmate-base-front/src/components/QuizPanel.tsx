@@ -95,7 +95,7 @@ export default function QuizPanel() {
               onChange={(e) => setReverseMode(e.target.checked)}
             />
           }
-          label="Reverse mode (native → target)"
+          label="Reverse mode (target → native)."
         />
         {!question && (
           <Typography variant="body2" color="text.secondary">
@@ -111,8 +111,14 @@ export default function QuizPanel() {
             <Box>
               <Typography variant="caption" color="text.secondary">
                 Translate from{" "}
-                {reverseMode ? question.native_language : question.source_language} to{" "}
-                {reverseMode ? question.source_language : question.native_language}.
+                {reverseMode
+                  ? question.native_language.toUpperCase()
+                  : question.source_language.toUpperCase()}{" "}
+                to{" "}
+                {reverseMode
+                  ? question.source_language.toUpperCase()
+                  : question.native_language.toUpperCase()}
+                .
               </Typography>
               <Typography variant="h4" fontWeight={700} mt={0.5}>
                 {question.source_word}
