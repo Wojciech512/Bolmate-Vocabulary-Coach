@@ -1,6 +1,7 @@
 # Config files
 *.ini
 !.env.example
+!bolmate-base-core/mypy.ini
 
 # Idea
 .idea

@@ -16,3 +16,14 @@ Homepage = "https://gitlab.com/bolmate/bolmate-base"
 [build-system]
 requires = ["setuptools>=62.6"]
 build-backend = "setuptools.build_meta"
+
+[tool.black]
+line-length = 88
+target-version = ["py312"]
+extend-exclude = ["alembic/"]
+
+[tool.isort]
+profile = "black"
+line_length = 88
+known_first_party = ["app"]
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
