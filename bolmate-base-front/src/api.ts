@@ -61,6 +61,7 @@ export type QuizQuestion = {
   translated_word: string;
   correct_count: number;
   incorrect_count: number;
+  is_reversed?: boolean;
 };
 
 export type QuizAnswerResponse = {
@@ -153,7 +154,8 @@ export const createFlashcard = (data: CreateFlashcardInput) =>
 export const deleteFlashcard = (id: number) =>
   api.delete<DeleteResponse>(`/api/flashcards/${id}`);
 
-export const getQuizQuestion = () => api.get<QuizQuestion>("/api/quiz");
+export const getQuizQuestion = (reverseMode: boolean, targetLanguage?: string) =>
+  api.get<QuizQuestion>("/api/quiz", { params: { reverse: reverseMode, target_language: targetLanguage } });
 
 export const submitQuizAnswer = (payload: SubmitQuizAnswerPayload) =>
   api.post<QuizAnswerResponse>("/api/quiz", payload);

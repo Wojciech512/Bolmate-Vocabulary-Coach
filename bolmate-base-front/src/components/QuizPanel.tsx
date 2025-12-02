@@ -4,7 +4,9 @@ import {
   Button,
   Card,
   CardContent,
+  FormControlLabel,
   Stack,
+  Switch,
   TextField,
   Typography,
 } from "@mui/material";
@@ -15,8 +17,10 @@ import {
   type QuizQuestion,
   type QuizAnswerResponse,
 } from "../api";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function QuizPanel() {
+  const { nativeLanguage } = useLanguage();
   const [question, setQuestion] = useState<QuizQuestion | null>(null);
   const [answer, setAnswer] = useState("");
   const [feedback, setFeedback] = useState<string | null>(null);
@@ -25,13 +29,14 @@ export default function QuizPanel() {
     "hint" | "example_sentence" | "example_translation"
   > | null>(null);
   const [loading, setLoading] = useState(false);
+  const [reverseMode, setReverseMode] = useState(false);
 
   const loadQuestion = async () => {
     setFeedback(null);
     setHint(null);
     setAnswer("");
     try {
-      const res = await getQuizQuestion();
+      const res = await getQuizQuestion(reverseMode, nativeLanguage);
       setQuestion(res.data);
     } catch (err: unknown) {
       const errorMessage =
@@ -39,12 +44,13 @@ export default function QuizPanel() {
           ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
           : undefined;
       setFeedback(errorMessage || "No questions available");
+      setQuestion(null);
     }
   };
 
   useEffect(() => {
     loadQuestion();
-  }, []);
+  }, [reverseMode, nativeLanguage]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,6 +88,15 @@ export default function QuizPanel() {
         <Typography variant="h6" gutterBottom>
           Quiz
         </Typography>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={reverseMode}
+              onChange={(e) => setReverseMode(e.target.checked)}
+            />
+          }
+          label="Reverse mode (native → target)"
+        />
         {!question && (
           <Typography variant="body2" color="text.secondary">
             Loading question...
@@ -95,7 +110,9 @@ export default function QuizPanel() {
           >
             <Box>
               <Typography variant="caption" color="text.secondary">
-                Translate from {question.source_language}
+                Translate from{" "}
+                {reverseMode ? question.native_language : question.source_language} to{" "}
+                {reverseMode ? question.source_language : question.native_language}.
               </Typography>
               <Typography variant="h4" fontWeight={700} mt={0.5}>
                 {question.source_word}

@@ -14,20 +14,49 @@ quiz_bp = Blueprint("quiz", __name__)
 
 @quiz_bp.get("/quiz")
 def get_quiz_question():
+    reverse = request.args.get("reverse", "false").lower() == "true"
+    target_language = request.args.get("target_language", "").strip().lower()
     session = SessionLocal()
     try:
-        card = session.query(Flashcard).order_by(func.random()).first()
+        query = session.query(Flashcard)
+
+        # Filtruj po target language (native_language w normalnym trybie)
+        if target_language:
+            if reverse:
+                # W reverse mode target language jest w source_language
+                query = query.filter(func.lower(Flashcard.source_language) == target_language)
+            else:
+                # W normalnym trybie target language jest w native_language
+                query = query.filter(func.lower(Flashcard.native_language) == target_language)
+
+        card = query.order_by(func.random()).first()
         if not card:
-            return jsonify({"error": "No flashcards available"}), 404
-        return jsonify({
-            "flashcard_id": card.id,
-            "source_word": card.source_word,
-            "source_language": card.source_language,
-            "native_language": card.native_language,
-            "translated_word": card.translated_word,
-            "correct_count": card.correct_count,
-            "incorrect_count": card.incorrect_count,
-        })
+            return jsonify({"error": "No flashcards available for the selected language"}), 404
+
+        if reverse:
+            # Odwrócony kierunek: pytamy o słowo w target language, odpowiedź w source language
+            return jsonify({
+                "flashcard_id": card.id,
+                "source_word": card.translated_word,
+                "source_language": card.native_language,
+                "native_language": card.source_language,
+                "translated_word": card.source_word,
+                "correct_count": card.correct_count,
+                "incorrect_count": card.incorrect_count,
+                "is_reversed": True,
+            })
+        else:
+            # Normalny kierunek: pytamy o source_word, odpowiedź w translated_word
+            return jsonify({
+                "flashcard_id": card.id,
+                "source_word": card.source_word,
+                "source_language": card.source_language,
+                "native_language": card.native_language,
+                "translated_word": card.translated_word,
+                "correct_count": card.correct_count,
+                "incorrect_count": card.incorrect_count,
+                "is_reversed": False,
+            })
     finally:
         session.close()
 
