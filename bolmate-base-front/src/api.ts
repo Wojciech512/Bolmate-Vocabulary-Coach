@@ -127,7 +127,7 @@ export type SwitchLanguageResponse = {
 export type DeleteResponse = {
   status: string;
 };
-// TODO "Failed to switch language. Please try again." oraz łądowanie w postaci pojawiającego się snackbara
+// TODO czy w tekście znajdują się już tłumaczenia danego słowa, jeżeli tak to wykorzystaj je do fiszki
 // TODO sticky header
 // TODO Daily quiz powinien określać w jakim języku słowa oczekuje, jeżeli jests więcej niż 2 będzie informować że istnieje zapisanych wiele opcji
 // TODO błędy aplikacji przedstawioane w podstaci snackbarów

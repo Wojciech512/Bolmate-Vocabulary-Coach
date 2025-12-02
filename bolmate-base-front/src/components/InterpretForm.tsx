@@ -156,40 +156,60 @@ export default function InterpretForm() {
                 Suggested flashcards ({results.length})
               </Typography>
               <List dense>
-                {results.map((item, idx) => (
-                  <ListItem
-                    key={`${item.source_word}-${idx}`}
-                    divider
-                    secondaryAction={
-                      <Button
-                        size="small"
-                        variant={addedIds.has(idx) ? "outlined" : "contained"}
-                        color={addedIds.has(idx) ? "success" : "primary"}
-                        onClick={() => handleAddFlashcard(item, idx)}
-                        disabled={addingIds.has(idx) || addedIds.has(idx)}
-                      >
-                        {addingIds.has(idx)
-                          ? "Adding..."
-                          : addedIds.has(idx)
-                            ? "Added"
-                            : "Add"}
-                      </Button>
-                    }
-                  >
-                    <ListItemText
-                      primary={`${item.source_word} → ${item.translated_word} (${item.native_language || nativeLanguage})`}
-                      secondary={
-                        item.example_sentence
-                          ? `${item.example_sentence}${
-                              item.example_sentence_translated
-                                ? ` — ${item.example_sentence_translated}`
-                                : ""
-                            }`
-                          : undefined
+                {results.map((item, idx) => {
+                  const isSameLanguage = item.source_language === nativeLanguage;
+                  return (
+                    <ListItem
+                      key={`${item.source_word}-${idx}`}
+                      divider
+                      secondaryAction={
+                        <Button
+                          size="small"
+                          variant={addedIds.has(idx) ? "outlined" : "contained"}
+                          color={addedIds.has(idx) ? "success" : "primary"}
+                          onClick={() => handleAddFlashcard(item, idx)}
+                          disabled={addingIds.has(idx) || addedIds.has(idx)}
+                        >
+                          {addingIds.has(idx)
+                            ? "Adding..."
+                            : addedIds.has(idx)
+                              ? "Added"
+                              : "Add"}
+                        </Button>
                       }
-                    />
-                  </ListItem>
-                ))}
+                      sx={{
+                        bgcolor: isSameLanguage ? "warning.50" : "transparent",
+                      }}
+                    >
+                      <ListItemText
+                        primary={
+                          <Box>
+                            {`${item.source_word} → ${item.translated_word} (${item.native_language || nativeLanguage})`}
+                            {isSameLanguage && (
+                              <Typography
+                                component="span"
+                                variant="caption"
+                                color="warning.main"
+                                sx={{ ml: 1, fontWeight: 600 }}
+                              >
+                                ⚠ Same as target language
+                              </Typography>
+                            )}
+                          </Box>
+                        }
+                        secondary={
+                          item.example_sentence
+                            ? `${item.example_sentence}${
+                                item.example_sentence_translated
+                                  ? ` — ${item.example_sentence_translated}`
+                                  : ""
+                              }`
+                            : undefined
+                        }
+                      />
+                    </ListItem>
+                  );
+                })}
               </List>
             </Box>
           )}

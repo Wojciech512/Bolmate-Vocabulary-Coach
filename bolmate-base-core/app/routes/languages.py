@@ -55,8 +55,6 @@ def list_languages():
 
 @languages_bp.post("/languages/switch")
 def switch_language():
-    """Translate existing flashcards into a newly selected language."""
-
     try:
         payload = request.get_json(silent=True) or {}
         data = SwitchLanguageRequest(**payload)

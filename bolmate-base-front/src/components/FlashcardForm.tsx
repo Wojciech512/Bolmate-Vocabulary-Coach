@@ -67,6 +67,7 @@ export default function FlashcardForm({ onCreated }: Props) {
   };
 
   const hasFieldError = Boolean(error);
+  const isSameLanguage = sourceLanguage === nativeLanguage;
 
   return (
     <Card variant="outlined" sx={{ mb: 3 }} component="form" onSubmit={handleSubmit}>
@@ -86,7 +87,7 @@ export default function FlashcardForm({ onCreated }: Props) {
               sx={{ flex: 1 }}
             />
             <LanguageIcon color="action" />
-            <FormControl sx={{ width: "150px" }}>
+            <FormControl sx={{ width: "150px" }} error={isSameLanguage}>
               <InputLabel id="source-language-label">Source language</InputLabel>
               <Select
                 labelId="source-language-label"
@@ -102,6 +103,11 @@ export default function FlashcardForm({ onCreated }: Props) {
               </Select>
             </FormControl>
           </Box>
+          {isSameLanguage && (
+            <Alert severity="warning" variant="outlined">
+              Warning: Source language is the same as target language ({nativeLanguage.toUpperCase()}). You may be translating to the same language.
+            </Alert>
+          )}
           <TextField
             label={`Translation (${nativeLanguage.toUpperCase()})`}
             value={translation}

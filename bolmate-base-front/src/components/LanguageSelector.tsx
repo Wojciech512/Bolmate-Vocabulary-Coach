@@ -37,43 +37,14 @@ const LanguageSelector = () => {
     setSnackbar({ open: false, message: "", severity: "info" });
 
     try {
-      const response = await switchToLanguage(newLang);
-      if (response) {
-        if (response.meta.translated_count === 0 && response.meta.skipped_count === 0) {
-          setSnackbar({
-            open: true,
-            message: "Language switched. No flashcards to translate yet.",
-            severity: "info",
-          });
-        } else {
-          setSnackbar({
-            open: true,
-            message: `Translated ${response.meta.translated_count} flashcard${
-              response.meta.translated_count !== 1 ? "s" : ""
-            } (skipped ${response.meta.skipped_count}).`,
-            severity: "success",
-          });
-        }
-      } else {
-        setSnackbar({
-          open: true,
-          message: "Language updated.",
-          severity: "info",
-        });
-      }
+      await switchToLanguage(newLang);
+      setSnackbar({
+        open: true,
+        message: `Target language changed to ${languages.find((l) => l.code === newLang)?.label || newLang}.`,
+        severity: "success",
+      });
     } catch (error: any) {
       console.error("Language switch failed", error);
-      const errorMsg = error?.response?.data?.error;
-
-      if (errorMsg && errorMsg.includes("No flashcards")) {
-        setSnackbar({
-          open: true,
-          message: "Language switched. Add flashcards to translate them.",
-          severity: "info",
-        });
-        return;
-      }
-
       setSnackbar({
         open: true,
         message: "Failed to switch language. Please try again.",
@@ -94,7 +65,7 @@ const LanguageSelector = () => {
 
         <Tooltip
           open={tooltipOpen && !selectOpen}
-          title="The language into which translations will be made"
+          title="The language used for translations and questions."
           placement="bottom-start"
           slotProps={{
             tooltip: {
