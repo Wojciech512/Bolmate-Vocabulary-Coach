@@ -42,8 +42,11 @@ export default function FlashcardForm({ onCreated }: Props) {
       setSourceWord("");
       setTranslation("");
       onCreated();
-    } catch (err: any) {
-      setError(err?.response?.data?.error || "Failed to save word");
+    } catch (err: unknown) {
+      const errorMessage = err && typeof err === 'object' && 'response' in err
+        ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
+        : undefined;
+      setError(errorMessage || "Failed to save word");
     } finally {
       setLoading(false);
     }
