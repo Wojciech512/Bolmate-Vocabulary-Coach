@@ -37,12 +37,14 @@ export default function QuizPanel() {
   const [reverseMode, setReverseMode] = useState(false);
   const [lastSubmittedAnswer, setLastSubmittedAnswer] = useState("");
   const [streak, setStreak] = useState(0);
+  const [isCorrect, setIsCorrect] = useState(false);
 
   const loadQuestion = async () => {
     setFeedback(null);
     setHint(null);
     setAnswer("");
     setLastSubmittedAnswer("");
+    setIsCorrect(false);
     setLoadingQuestion(true);
     try {
       const res = await getQuizQuestion(reverseMode, nativeLanguage);
@@ -68,16 +70,20 @@ export default function QuizPanel() {
     if (!question) return;
     setLoading(true);
     try {
-      const res = await submitQuizAnswer({
-        flashcard_id: question.flashcard_id,
-        answer,
-      }, reverseMode);
+      const res = await submitQuizAnswer(
+        {
+          flashcard_id: question.flashcard_id,
+          answer,
+        },
+        reverseMode,
+      );
       setLastSubmittedAnswer(answer);
 
       if (res.data.correct) {
         const newStreak = streak + 1;
         setStreak(newStreak);
         setFeedback("Correct!");
+        setIsCorrect(true);
 
         // Trigger confetti at milestones
         if (newStreak === 3 || newStreak === 5 || newStreak === 10) {
@@ -86,6 +92,7 @@ export default function QuizPanel() {
       } else {
         setStreak(0);
         setFeedback(`Incorrect. Correct answer: ${res.data.correctAnswer}`);
+        setIsCorrect(false);
       }
 
       setHint({
@@ -94,7 +101,6 @@ export default function QuizPanel() {
         example_translation: res.data.example_translation,
       });
     } catch {
-      // Error is handled by global interceptor
       setFeedback("Failed to submit answer");
     } finally {
       setLoading(false);
@@ -117,7 +123,14 @@ export default function QuizPanel() {
           label="Reverse mode (target → native)."
         />
         {loadingQuestion && (
-          <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", py: 4 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              py: 4,
+            }}
+          >
             <CircularProgress />
           </Box>
         )}
@@ -159,9 +172,11 @@ export default function QuizPanel() {
             <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
               <Tooltip
                 title={
-                  feedback && answer === lastSubmittedAnswer
-                    ? "Change your answer to check again"
-                    : ""
+                  isCorrect
+                    ? "Let's go next!"
+                    : feedback && answer === lastSubmittedAnswer
+                      ? "Change your answer to check again"
+                      : ""
                 }
                 arrow
               >
@@ -169,7 +184,11 @@ export default function QuizPanel() {
                   <StyledButton
                     type="submit"
                     variant="primary"
-                    disabled={loading || (feedback !== null && answer === lastSubmittedAnswer)}
+                    disabled={
+                      loading ||
+                      isCorrect ||
+                      (feedback !== null && answer === lastSubmittedAnswer)
+                    }
                     sx={{ minWidth: 140 }}
                   >
                     {loading ? "Checking..." : "Check"}

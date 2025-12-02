@@ -159,11 +159,11 @@ export type BulkCreateFlashcardsResponse = {
   skipped_count: number;
   error_details?: string[];
 };
-// TODO optymalizacja zapytań do AI żeby mniej płacić
+// TODO płynne przejśćia w quiz między quizami
+// TODO responsywność nagłówka
+
 // TODO aktualizacja dokumentacji
 // TODO testy i formatowanie kodu
-// TODO gdy odpowiedzono poprawnie w quiz to chceck powinien być zablokowany do następnego quizu po kliknięciu next word
-// TODO responsywność mobilne
 export const fetchFlashcards = () => api.get<Flashcard[]>("/api/flashcards");
 
 export const createFlashcard = (data: CreateFlashcardInput) =>
