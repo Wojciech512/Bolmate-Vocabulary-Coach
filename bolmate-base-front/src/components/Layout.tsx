@@ -23,7 +23,7 @@ function Layout({ children }: LayoutProps) {
       minHeight="100vh"
       bgcolor="background.default"
     >
-      <AppBar position="static" sx={{ bgcolor: "white" }}>
+      <AppBar position="sticky" sx={{ bgcolor: "white" }}>
         <Toolbar sx={{ gap: 2 }}>
           <Box sx={{ position: "relative", display: "inline-block" }}>
             <Box
