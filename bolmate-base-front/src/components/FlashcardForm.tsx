@@ -63,12 +63,12 @@ export default function FlashcardForm({ onCreated }: Props) {
         </Typography>
         <Stack spacing={2}>
           <TextField
-            label="Spanish / Source word"
+            label="Source word"
             value={sourceWord}
             onChange={(e) => setSourceWord(e.target.value)}
             required
             error={hasFieldError && !sourceWord}
-            helperText={hasFieldError && !sourceWord ? "Spanish word is required" : ""}
+            helperText={hasFieldError && !sourceWord ? "Source word is required" : ""}
           />
           <TextField
             label={`Translation (${nativeLanguage.toUpperCase()})`}

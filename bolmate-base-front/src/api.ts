@@ -129,6 +129,9 @@ export type DeleteResponse = {
 };
 // TODO "Failed to switch language. Please try again." oraz łądowanie w postaci pojawiającego się snackbara
 // TODO sticky header
+// TODO błędy aplikacji przedstawioane w podstaci snackbarów
+// TODO poprawne operacje przedstawiane w postaci snackbarów
+// TODO "Flashcard already exists for this language pair." powinno dokładać tłumaczenie do listy
 // TODO sprawdzanie duplikatów i agregowanie podobnych słów
 // TODO paginacja w flashcards
 // TODO rozróżnienie zwrotów od pojedyńczych słów

@@ -26,7 +26,7 @@ export default function FlashcardsPage() {
           Your notebook
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Add Spanish words with translations, then practice them.
+          Add words with translations, then practice them.
         </Typography>
       </Box>
       <Stack spacing={2}>
