@@ -9,13 +9,21 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { getQuizQuestion, submitQuizAnswer, type QuizQuestion, type QuizAnswerResponse } from "../api";
+import {
+  getQuizQuestion,
+  submitQuizAnswer,
+  type QuizQuestion,
+  type QuizAnswerResponse,
+} from "../api";
 
 export default function QuizPanel() {
   const [question, setQuestion] = useState<QuizQuestion | null>(null);
   const [answer, setAnswer] = useState("");
   const [feedback, setFeedback] = useState<string | null>(null);
-  const [hint, setHint] = useState<Pick<QuizAnswerResponse, 'hint' | 'example_sentence' | 'example_translation'> | null>(null);
+  const [hint, setHint] = useState<Pick<
+    QuizAnswerResponse,
+    "hint" | "example_sentence" | "example_translation"
+  > | null>(null);
   const [loading, setLoading] = useState(false);
 
   const loadQuestion = async () => {
@@ -26,9 +34,10 @@ export default function QuizPanel() {
       const res = await getQuizQuestion();
       setQuestion(res.data);
     } catch (err: unknown) {
-      const errorMessage = err && typeof err === 'object' && 'response' in err
-        ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
-        : undefined;
+      const errorMessage =
+        err && typeof err === "object" && "response" in err
+          ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
+          : undefined;
       setFeedback(errorMessage || "No questions available");
     }
   };
@@ -57,9 +66,10 @@ export default function QuizPanel() {
         example_translation: res.data.example_translation,
       });
     } catch (err: unknown) {
-      const errorMessage = err && typeof err === 'object' && 'response' in err
-        ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
-        : undefined;
+      const errorMessage =
+        err && typeof err === "object" && "response" in err
+          ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
+          : undefined;
       setFeedback(errorMessage || "Failed to submit answer");
     } finally {
       setLoading(false);

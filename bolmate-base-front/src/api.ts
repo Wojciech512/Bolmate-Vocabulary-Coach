@@ -128,8 +128,6 @@ export type DeleteResponse = {
   status: string;
 };
 
-// ============= API Functions =============
-
 // TODO selektor języka na który mają być wykonywane tłumaczenia - przy zmianie języka w aplikacji wszystkie obecne fiszki zostają przetłumaczone na wybrany język
 // TODO opisy aplikacji że jest uniwersalna dla każdego języka
 // TODO interpretowanie danych z plików tekstowych (.pdf, .docx itd.), zdjęciowych w Interpret (OCR & AI)
@@ -139,8 +137,7 @@ export type DeleteResponse = {
 // TODO testy
 // TODO responsywność
 
-export const fetchFlashcards = () =>
-  api.get<Flashcard[]>("/api/flashcards");
+export const fetchFlashcards = () => api.get<Flashcard[]>("/api/flashcards");
 
 export const createFlashcard = (data: CreateFlashcardInput) =>
   api.post<Flashcard>("/api/flashcards", data);
@@ -148,8 +145,7 @@ export const createFlashcard = (data: CreateFlashcardInput) =>
 export const deleteFlashcard = (id: number) =>
   api.delete<DeleteResponse>(`/api/flashcards/${id}`);
 
-export const getQuizQuestion = () =>
-  api.get<QuizQuestion>("/api/quiz");
+export const getQuizQuestion = () => api.get<QuizQuestion>("/api/quiz");
 
 export const submitQuizAnswer = (payload: SubmitQuizAnswerPayload) =>
   api.post<QuizAnswerResponse>("/api/quiz", payload);
@@ -158,10 +154,12 @@ export const generateQuiz = (payload: GenerateQuizPayload) =>
   api.post<GenerateQuizResponse>("/api/quiz/generate", payload);
 
 export const interpretText = (text: string, native_language: string) =>
-  api.post<InterpretResponse>("/api/interpret", { text, native_language } as InterpretTextPayload);
+  api.post<InterpretResponse>("/api/interpret", {
+    text,
+    native_language,
+  } as InterpretTextPayload);
 
-export const fetchLanguages = () =>
-  api.get<LanguagesResponse>("/api/languages");
+export const fetchLanguages = () => api.get<LanguagesResponse>("/api/languages");
 
 export const switchLanguage = (payload: SwitchLanguagePayload) =>
   api.post<SwitchLanguageResponse>("/api/languages/switch", payload);
