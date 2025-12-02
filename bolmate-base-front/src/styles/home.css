@@ -7,10 +7,34 @@
   max-width: 720px;
 }
 
-.home ul {
-  padding-left: 20px;
+.home-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-.home li {
-  margin-bottom: 6px;
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.home-grid article {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 12px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.button {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  background-color: #111827;
+  color: white;
+}
+
+.button.secondary {
+  background-color: #2563eb;
 }

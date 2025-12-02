@@ -15,6 +15,11 @@
   margin-bottom: 24px;
 }
 
+.subtitle {
+  margin: 4px 0 0;
+  color: #6b7280;
+}
+
 .app-header nav {
   display: flex;
   gap: 12px;
@@ -35,6 +40,18 @@
 
 .app-header a:hover:not(.active) {
   border-color: #d1d5db;
+}
+
+.language-picker {
+  display: grid;
+  gap: 4px;
+  color: #374151;
+}
+
+.language-picker select {
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
 }
 
 .app-content {
