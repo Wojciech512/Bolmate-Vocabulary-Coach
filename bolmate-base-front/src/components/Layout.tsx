@@ -1,7 +1,6 @@
 import {
   AppBar,
   Box,
-  Button,
   Container,
   Toolbar,
   Typography,
@@ -11,6 +10,7 @@ import {
 import { Link as RouterLink, useLocation } from "react-router-dom";
 import LanguageSelector from "./LanguageSelector";
 import { useThemeMode } from "../context/ThemeContext";
+import { StyledButton } from "./ui";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -81,20 +81,17 @@ function Layout({ children }: LayoutProps) {
               location.pathname === item.path ||
               location.pathname.startsWith(item.path + "/");
             return (
-              <Button
+              <StyledButton
                 key={item.path}
                 component={RouterLink}
                 to={item.path}
-                color={isActive ? "secondary" : "inherit"}
-                variant={isActive ? "contained" : "text"}
+                variant={isActive ? "secondary" : "text"}
                 sx={{
-                  textTransform: "none",
-                  fontWeight: isActive ? 700 : 500,
                   color: isActive ? undefined : "text.primary",
                 }}
               >
                 {item.label}
-              </Button>
+              </StyledButton>
             );
           })}
         </Toolbar>

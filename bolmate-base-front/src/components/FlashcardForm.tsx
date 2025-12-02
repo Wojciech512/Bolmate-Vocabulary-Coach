@@ -1,6 +1,5 @@
 import {
   Alert,
-  Button,
   Card,
   CardActions,
   CardContent,
@@ -19,6 +18,7 @@ import { useLanguage } from "../context/LanguageContext";
 import { useLoading } from "../context/LoadingContext";
 import { useSnackbar } from "../context/SnackbarContext";
 import LanguageIcon from "@mui/icons-material/Language";
+import { StyledButton } from "./ui";
 
 type Props = {
   onCreated: () => void;
@@ -130,9 +130,9 @@ export default function FlashcardForm({ onCreated }: Props) {
         </Stack>
       </CardContent>
       <CardActions sx={{ px: 3, pb: 3 }}>
-        <Button type="submit" variant="contained" disabled={loading} fullWidth>
+        <StyledButton type="submit" variant="primary" disabled={loading} fullWidth>
           {loading ? "Saving..." : "Save word"}
-        </Button>
+        </StyledButton>
       </CardActions>
     </Card>
   );

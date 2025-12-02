@@ -1,7 +1,6 @@
 import {
   Alert,
   Box,
-  Button,
   Card,
   CardContent,
   CardHeader,
@@ -16,6 +15,7 @@ import {
 } from "@mui/material";
 import { FormEvent, useEffect, useState } from "react";
 import api from "../api";
+import { StyledButton } from "../components/ui";
 
 type User = {
   id: number;
@@ -107,9 +107,9 @@ function UsersPage() {
                     {error}
                   </Alert>
                 )}
-                <Button type="submit" variant="contained" disabled={loading} fullWidth>
+                <StyledButton type="submit" variant="primary" disabled={loading} fullWidth>
                   {loading ? "Submitting..." : "Create user"}
-                </Button>
+                </StyledButton>
               </Stack>
             </CardContent>
           </Card>
@@ -120,9 +120,9 @@ function UsersPage() {
             <CardHeader
               title="Existing users"
               action={
-                <Button onClick={fetchUsers} disabled={loading} variant="outlined">
+                <StyledButton onClick={fetchUsers} disabled={loading} variant="outlined">
                   Refresh
-                </Button>
+                </StyledButton>
               }
             />
             <Divider />

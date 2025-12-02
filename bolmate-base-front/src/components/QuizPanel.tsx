@@ -1,7 +1,6 @@
 import {
   Alert,
   Box,
-  Button,
   Card,
   CardContent,
   FormControlLabel,
@@ -19,6 +18,7 @@ import {
   type QuizAnswerResponse,
 } from "../api";
 import { useLanguage } from "../context/LanguageContext";
+import { StyledButton } from "./ui";
 
 export default function QuizPanel() {
   const { nativeLanguage } = useLanguage();
@@ -139,22 +139,21 @@ export default function QuizPanel() {
               fullWidth
             />
             <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
-              <Button
+              <StyledButton
                 type="submit"
-                variant="contained"
+                variant="primary"
                 disabled={loading}
                 sx={{ minWidth: 140 }}
               >
                 {loading ? "Checking..." : "Check"}
-              </Button>
-              <Button
+              </StyledButton>
+              <StyledButton
                 variant="outlined"
-                color="secondary"
                 onClick={loadQuestion}
                 sx={{ minWidth: 140 }}
               >
                 Next word
-              </Button>
+              </StyledButton>
             </Stack>
           </Box>
         )}

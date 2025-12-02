@@ -6,7 +6,6 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import {
   Alert,
   Box,
-  Button,
   Card,
   CardContent,
   Divider,
@@ -44,6 +43,7 @@ import {
 } from "../api";
 import { useLanguage } from "../context/LanguageContext";
 import { useSnackbar } from "../context/SnackbarContext";
+import { StyledButton } from "./ui";
 
 type InputMode = "text" | "file";
 
@@ -310,8 +310,8 @@ export default function InterpretForm() {
           )}
 
           <Stack direction="row" spacing={1} justifyContent="flex-start">
-            <Button
-              variant="contained"
+            <StyledButton
+              variant="primary"
               startIcon={
                 loading ? (
                   <CircularProgress size={20} color="inherit" />
@@ -325,8 +325,8 @@ export default function InterpretForm() {
               }
             >
               {loading ? "Processing..." : "Interpret"}
-            </Button>
-            <Button
+            </StyledButton>
+            <StyledButton
               variant="outlined"
               startIcon={<AddIcon />}
               onClick={handleAddAll}
@@ -337,7 +337,7 @@ export default function InterpretForm() {
               {addingAll
                 ? "Adding..."
                 : `Add all (${Math.max(results.length - addedIds.size, 0)})`}
-            </Button>
+            </StyledButton>
           </Stack>
 
           {error && (

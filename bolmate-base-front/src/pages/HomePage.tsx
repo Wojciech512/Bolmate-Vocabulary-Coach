@@ -1,6 +1,7 @@
-import { Card, CardActions, CardContent, Button, Typography, Box } from "@mui/material";
+import { Card, CardActions, CardContent, Typography, Box } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { Link as RouterLink } from "react-router-dom";
+import { StyledButton } from "../components/ui";
 
 function HomePage() {
   return (
@@ -25,14 +26,14 @@ function HomePage() {
               </Typography>
             </CardContent>
             <CardActions sx={{ px: 2, pb: 2 }}>
-              <Button
+              <StyledButton
                 component={RouterLink}
                 to="/flashcards"
-                variant="contained"
+                variant="primary"
                 fullWidth
               >
                 Go to Flashcards
-              </Button>
+              </StyledButton>
             </CardActions>
           </Card>
         </Grid>
@@ -48,9 +49,9 @@ function HomePage() {
               </Typography>
             </CardContent>
             <CardActions sx={{ px: 2, pb: 2 }}>
-              <Button component={RouterLink} to="/quiz" variant="contained" fullWidth>
+              <StyledButton component={RouterLink} to="/quiz" variant="primary" fullWidth>
                 Start Quiz
-              </Button>
+              </StyledButton>
             </CardActions>
           </Card>
         </Grid>
@@ -66,14 +67,14 @@ function HomePage() {
               </Typography>
             </CardContent>
             <CardActions sx={{ px: 2, pb: 2 }}>
-              <Button
+              <StyledButton
                 component={RouterLink}
                 to="/interpret"
-                variant="contained"
+                variant="primary"
                 fullWidth
               >
                 Try Interpret
-              </Button>
+              </StyledButton>
             </CardActions>
           </Card>
         </Grid>
