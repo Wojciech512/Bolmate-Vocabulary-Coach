@@ -7,7 +7,9 @@ type LanguageContextValue = {
 
 const LanguageContext = createContext<LanguageContextValue | undefined>(undefined);
 
-export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [nativeLanguage, setNativeLanguageState] = useState<string>(() => {
     return localStorage.getItem("nativeLanguage") || "pl";
   });
@@ -32,4 +34,3 @@ export const useLanguage = (): LanguageContextValue => {
   }
   return ctx;
 };
-

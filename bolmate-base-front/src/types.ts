@@ -19,4 +19,3 @@ export type QuizQuestion = {
   answer: string;
   options?: string[];
 };
-

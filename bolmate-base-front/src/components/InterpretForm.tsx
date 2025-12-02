@@ -93,7 +93,8 @@ export default function InterpretForm() {
           <Box>
             <Typography variant="h6">Interpret notebook text</Typography>
             <Typography variant="body2" color="text.secondary">
-              Paste text or sentences from your notebook. We'll extract unique words and translate them.
+              Paste text or sentences from your notebook. We'll extract unique words and
+              translate them.
             </Typography>
           </Box>
 
@@ -120,9 +121,13 @@ export default function InterpretForm() {
               variant="outlined"
               startIcon={<AddIcon />}
               onClick={handleAddAll}
-              disabled={addingAll || results.length === 0 || addedIds.size === results.length}
+              disabled={
+                addingAll || results.length === 0 || addedIds.size === results.length
+              }
             >
-              {addingAll ? "Adding..." : `Add all (${Math.max(results.length - addedIds.size, 0)})`}
+              {addingAll
+                ? "Adding..."
+                : `Add all (${Math.max(results.length - addedIds.size, 0)})`}
             </Button>
           </Stack>
 
@@ -151,7 +156,11 @@ export default function InterpretForm() {
                         onClick={() => handleAddFlashcard(item, idx)}
                         disabled={addingIds.has(idx) || addedIds.has(idx)}
                       >
-                        {addingIds.has(idx) ? "Adding..." : addedIds.has(idx) ? "Added" : "Add"}
+                        {addingIds.has(idx)
+                          ? "Adding..."
+                          : addedIds.has(idx)
+                            ? "Added"
+                            : "Add"}
                       </Button>
                     }
                   >

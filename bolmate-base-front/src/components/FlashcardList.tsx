@@ -67,7 +67,8 @@ export default function FlashcardList({ flashcards, onDeleted }: Props) {
                     {card.example_sentence && (
                       <Typography variant="body2" color="text.secondary">
                         {card.example_sentence}
-                        {card.example_sentence_translated && ` — ${card.example_sentence_translated}`}
+                        {card.example_sentence_translated &&
+                          ` — ${card.example_sentence_translated}`}
                       </Typography>
                     )}
                   </Stack>
@@ -77,7 +78,12 @@ export default function FlashcardList({ flashcards, onDeleted }: Props) {
                     <Typography variant="body2">✅ {card.correct_count}</Typography>
                     <Typography variant="body2">❌ {card.incorrect_count}</Typography>
                     {card.difficulty_level && (
-                      <Chip label={card.difficulty_level} color="primary" variant="outlined" size="small" />
+                      <Chip
+                        label={card.difficulty_level}
+                        color="primary"
+                        variant="outlined"
+                        size="small"
+                      />
                     )}
                   </Stack>
                 </TableCell>
@@ -96,4 +102,3 @@ export default function FlashcardList({ flashcards, onDeleted }: Props) {
     </Card>
   );
 }
-
