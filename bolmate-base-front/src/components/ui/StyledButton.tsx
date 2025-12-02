@@ -5,6 +5,8 @@ export type StyledButtonVariant = "primary" | "secondary" | "outlined" | "text" 
 
 export interface StyledButtonProps extends Omit<ButtonProps, "variant" | "color"> {
   variant?: StyledButtonVariant;
+  component?: React.ElementType;
+  to?: string;
 }
 
 /**

@@ -10,6 +10,7 @@ import {
   Tooltip,
   Typography,
   CircularProgress,
+  Fade,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import {
@@ -38,6 +39,7 @@ export default function QuizPanel() {
   const [lastSubmittedAnswer, setLastSubmittedAnswer] = useState("");
   const [streak, setStreak] = useState(0);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [fadeIn, setFadeIn] = useState(true);
 
   const loadQuestion = async () => {
     setFeedback(null);
