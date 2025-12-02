@@ -50,7 +50,9 @@ def generate_hint_for_flashcard(
         return {}
 
 
-def enrich_flashcards(words: List[Dict[str, Any]], native_language: str) -> List[Dict[str, Any]]:
+def enrich_flashcards(
+    words: List[Dict[str, Any]], native_language: str
+) -> List[Dict[str, Any]]:
     client = _get_client()
     if not client:
         return words
@@ -80,7 +82,9 @@ def enrich_flashcards(words: List[Dict[str, Any]], native_language: str) -> List
         return words
 
 
-def generate_quiz_questions(cards: List[Dict[str, Any]], num_questions: int) -> List[Dict[str, Any]]:
+def generate_quiz_questions(
+    cards: List[Dict[str, Any]], num_questions: int
+) -> List[Dict[str, Any]]:
     client = _get_client()
     if not client or not cards:
         return _fallback_quiz(cards, num_questions)
@@ -95,7 +99,10 @@ def generate_quiz_questions(cards: List[Dict[str, Any]], num_questions: int) -> 
             temperature=settings.openai_temperature,
             messages=[
                 {"role": "system", "content": prompt},
-                {"role": "user", "content": f"Use these flashcards: {cards[:num_questions]}"},
+                {
+                    "role": "user",
+                    "content": f"Use these flashcards: {cards[:num_questions]}",
+                },
             ],
             response_format={"type": "json_object"},
         )
@@ -135,7 +142,9 @@ def interpret_text_with_ai(text: str, native_language: str) -> List[Dict[str, An
         return []
 
 
-def translate_flashcards(cards: List[Dict[str, Any]], target_language: str) -> List[Dict[str, Any]]:
+def translate_flashcards(
+    cards: List[Dict[str, Any]], target_language: str
+) -> List[Dict[str, Any]]:
     """Translate provided flashcards to the target language while keeping structure intact."""
 
     client = _get_client()
@@ -203,7 +212,9 @@ def _safe_parse_json(text: str) -> Dict[str, Any]:
             return {}
 
 
-def _fallback_quiz(cards: List[Dict[str, Any]], num_questions: int) -> List[Dict[str, Any]]:
+def _fallback_quiz(
+    cards: List[Dict[str, Any]], num_questions: int
+) -> List[Dict[str, Any]]:
     questions: List[Dict[str, Any]] = []
     for card in cards[:num_questions]:
         questions.append(
@@ -214,4 +225,3 @@ def _fallback_quiz(cards: List[Dict[str, Any]], num_questions: int) -> List[Dict
             }
         )
     return questions
-

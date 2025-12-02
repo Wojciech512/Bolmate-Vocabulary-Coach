@@ -12,7 +12,9 @@ interpret_bp = Blueprint("interpret", __name__)
 
 @interpret_bp.post("/interpret")
 def interpret_payload():
-    native_language = request.form.get("native_language") or request.args.get("native_language")
+    native_language = request.form.get("native_language") or request.args.get(
+        "native_language"
+    )
     if not native_language:
         native_language = get_settings().default_native_language
 
@@ -24,7 +26,10 @@ def interpret_payload():
             native_language = data.native_language
             text = data.text
         except ValidationError as e:
-            return jsonify({"error": "Invalid request data", "details": e.errors()}), 400
+            return (
+                jsonify({"error": "Invalid request data", "details": e.errors()}),
+                400,
+            )
         items = interpret_text_with_ai(text, native_language) if text else []
         return jsonify({"items": items})
 
@@ -52,4 +57,3 @@ def interpret_payload():
             results.extend(placeholder)
 
     return jsonify({"items": results})
-

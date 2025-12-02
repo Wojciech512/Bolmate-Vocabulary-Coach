@@ -1,14 +1,24 @@
 PY_SOURCES=app config wsgi.py
 
-.PHONY: format lint typecheck
+# Detect OS and set Python path accordingly
+ifeq ($(OS),Windows_NT)
+    PYTHON := ../.venv/Scripts/python.exe
+else
+    PYTHON := python
+endif
+
+.PHONY: format lint typecheck test
 
 format:
-black $(PY_SOURCES)
-isort $(PY_SOURCES)
+	$(PYTHON) -m black $(PY_SOURCES)
+	$(PYTHON) -m isort $(PY_SOURCES)
 
 lint:
-flake8 $(PY_SOURCES)
-mypy $(PY_SOURCES)
+	$(PYTHON) -m flake8 $(PY_SOURCES)
+	$(PYTHON) -m mypy $(PY_SOURCES)
 
 typecheck:
-mypy $(PY_SOURCES)
+	$(PYTHON) -m mypy $(PY_SOURCES)
+
+test:
+	$(PYTHON) -m pytest tests/ -v

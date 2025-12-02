@@ -70,15 +70,20 @@ def switch_language():
         cards = query.order_by(Flashcard.id.asc()).all()
         if not cards:
             # No flashcards yet - return empty success response
-            return jsonify({
-                "flashcards": [],
-                "meta": {
-                    "target_language": data.target_language,
-                    "translated_count": 0,
-                    "skipped_count": 0,
-                    "force_retranslate": data.force_retranslate,
-                }
-            }), 200
+            return (
+                jsonify(
+                    {
+                        "flashcards": [],
+                        "meta": {
+                            "target_language": data.target_language,
+                            "translated_count": 0,
+                            "skipped_count": 0,
+                            "force_retranslate": data.force_retranslate,
+                        },
+                    }
+                ),
+                200,
+            )
 
         to_translate = [
             card
@@ -98,27 +103,40 @@ def switch_language():
 
         for card in to_translate:
             # Check for potential duplicates
-            existing = session.query(Flashcard).filter(
-                Flashcard.source_word == card.source_word,
-                Flashcard.source_language == card.source_language,
-                Flashcard.native_language == new_language_lower,
-                Flashcard.id != card.id
-            ).first()
+            existing = (
+                session.query(Flashcard)
+                .filter(
+                    Flashcard.source_word == card.source_word,
+                    Flashcard.source_language == card.source_language,
+                    Flashcard.native_language == new_language_lower,
+                    Flashcard.id != card.id,
+                )
+                .first()
+            )
 
             if existing:
-                return jsonify({
-                    "error": "Cannot switch language - duplicate flashcard would be created",
-                    "details": f"Flashcard '{card.source_word}' already exists with target language '{new_language_lower}'"
-                }), 409
+                return (
+                    jsonify(
+                        {
+                            "error": "Cannot switch language - duplicate flashcard would be created",
+                            "details": f"Flashcard '{card.source_word}' already exists with target language '{new_language_lower}'",
+                        }
+                    ),
+                    409,
+                )
 
         for card in to_translate:
             payload = translated_by_id.get(card.id, {})
             card.native_language = new_language_lower
-            card.translated_word = payload.get("translated_word") or card.translated_word
+            card.translated_word = (
+                payload.get("translated_word") or card.translated_word
+            )
             if payload.get("example_sentence") and not card.example_sentence:
                 card.example_sentence = payload["example_sentence"]
             example_translation = payload.get("example_sentence_translated") or (
-                payload.get("example_sentence") if not card.example_sentence_translated else None
+                payload.get("example_sentence")
+                if not card.example_sentence_translated
+                else None
             )
             if example_translation:
                 card.example_sentence_translated = example_translation
@@ -138,4 +156,3 @@ def switch_language():
         return jsonify(response.model_dump())
     finally:
         session.close()
-

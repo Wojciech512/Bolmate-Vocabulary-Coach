@@ -1,11 +1,11 @@
 from flask import Flask
 
-from app.routes.health import health_bp
-from app.routes.users import users_bp
 from app.routes.flashcards import flashcards_bp
-from app.routes.quiz import quiz_bp
+from app.routes.health import health_bp
 from app.routes.interpret import interpret_bp
 from app.routes.languages import languages_bp
+from app.routes.quiz import quiz_bp
+from app.routes.users import users_bp
 
 
 def register_blueprints(app: Flask) -> None:

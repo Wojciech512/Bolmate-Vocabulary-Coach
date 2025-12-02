@@ -150,12 +150,13 @@ export type DeleteResponse = {
 };
 // TODO jeżeli w podanym tekście znajdują się już tłumaczenia danego słowa, jeżeli tak to wykorzystaj je do fiszki i połącz te słowa, sprawdzanie duplikatów i agregowanie podobnych słów
 // TODO interpretowanie danych z plików tekstowych (.pdf, .docx itd.), zdjęciowych w Interpret (OCR & AI)
+
+// TODO aktualizacja dokumentacji
+
 // TODO generowanie memów tak aby zapamiętywać słowa?
 // TODO quiz w postaci obracanych kart (animacje)
-// TODO testy
-// TODO konfetti jeżeli przejdzie się przez sekwencje 10 słów dobrze pod rząd
+// TODO konfetti z boków jeżeli przejdzie się przez sekwencje 10 słów dobrze pod rząd
 // TODO responsywność mobilne
-// TODO aktualizacja dokumentacji
 export const fetchFlashcards = () => api.get<Flashcard[]>("/api/flashcards");
 
 export const createFlashcard = (data: CreateFlashcardInput) =>

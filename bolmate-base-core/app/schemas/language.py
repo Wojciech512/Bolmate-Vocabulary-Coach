@@ -42,4 +42,3 @@ class SwitchLanguageResponse(BaseModel):
 
     flashcards: List[FlashcardResponse]
     meta: SwitchLanguageMeta
-

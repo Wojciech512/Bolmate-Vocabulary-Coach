@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from pydantic import ValidationError
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
 
 from app.db.session import SessionLocal
 from app.models import Flashcard
@@ -37,7 +37,9 @@ def list_flashcards():
         source_language = request.args.get("source_language")
         difficulty = request.args.get("difficulty_level")
         if source_language:
-            query = query.filter(func.lower(Flashcard.source_language) == source_language.lower())
+            query = query.filter(
+                func.lower(Flashcard.source_language) == source_language.lower()
+            )
         if difficulty:
             query = query.filter(Flashcard.difficulty_level == difficulty)
         cards = query.all()
@@ -56,7 +58,9 @@ def create_flashcard():
 
     source_word = data.source_word.strip()
     translated_word = data.translated_word.strip()
-    native_language = (data.native_language or get_settings().default_native_language).strip()
+    native_language = (
+        data.native_language or get_settings().default_native_language
+    ).strip()
     source_language = (data.source_language or "es").strip() or "es"
 
     session = SessionLocal()
@@ -77,7 +81,10 @@ def create_flashcard():
         return jsonify(_serialize_flashcard(card)), 201
     except IntegrityError:
         session.rollback()
-        return jsonify({"error": "Flashcard already exists for this language pair."}), 409
+        return (
+            jsonify({"error": "Flashcard already exists for this language pair."}),
+            409,
+        )
     finally:
         session.close()
 
@@ -120,7 +127,10 @@ def update_flashcard(card_id: int):
         return jsonify(_serialize_flashcard(card))
     except IntegrityError:
         session.rollback()
-        return jsonify({"error": "Flashcard already exists for this language pair."}), 409
+        return (
+            jsonify({"error": "Flashcard already exists for this language pair."}),
+            409,
+        )
     finally:
         session.close()
 
@@ -153,13 +163,21 @@ def enrich_existing_flashcards():
         cards = session.query(Flashcard).filter(Flashcard.id.in_(data.ids)).all()
         if not cards:
             return jsonify({"error": "No flashcards found"}), 404
-        enriched = enrich_flashcards([_serialize_flashcard(c) for c in cards], native_language)
+        enriched = enrich_flashcards(
+            [_serialize_flashcard(c) for c in cards], native_language
+        )
         for card, enrich_data in zip(cards, enriched):
-            card.example_sentence = enrich_data.get("example_sentence") or card.example_sentence
-            card.example_sentence_translated = enrich_data.get("example_translation") or card.example_sentence_translated
-            card.difficulty_level = enrich_data.get("difficulty_level") or card.difficulty_level
+            card.example_sentence = (
+                enrich_data.get("example_sentence") or card.example_sentence
+            )
+            card.example_sentence_translated = (
+                enrich_data.get("example_translation")
+                or card.example_sentence_translated
+            )
+            card.difficulty_level = (
+                enrich_data.get("difficulty_level") or card.difficulty_level
+            )
         session.commit()
         return jsonify([_serialize_flashcard(c) for c in cards])
     finally:
         session.close()
-
