@@ -22,6 +22,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  TextField,
 } from "@mui/material";
 import { useState } from "react";
 import { Flashcard } from "../types";
@@ -40,6 +41,8 @@ export default function FlashcardList({ flashcards, onDeleted }: Props) {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [searchFilter, setSearchFilter] = useState("");
+  const [languageFilter, setLanguageFilter] = useState<string>("all");
   const { withLoading } = useLoading();
   const { showSuccess } = useSnackbar();
 
@@ -64,7 +67,27 @@ export default function FlashcardList({ flashcards, onDeleted }: Props) {
     setPage(0);
   };
 
-  const paginatedFlashcards = flashcards.slice(
+  const filteredFlashcards = flashcards.filter((card) => {
+    const matchesSearch =
+      !searchFilter ||
+      card.source_word.toLowerCase().includes(searchFilter.toLowerCase()) ||
+      card.translated_word.toLowerCase().includes(searchFilter.toLowerCase());
+
+    const matchesLanguage =
+      languageFilter === "all" ||
+      card.source_language === languageFilter ||
+      card.native_language === languageFilter;
+
+    return matchesSearch && matchesLanguage;
+  });
+
+  const availableLanguages = Array.from(
+    new Set(
+      flashcards.flatMap((card) => [card.source_language, card.native_language])
+    )
+  ).filter(Boolean);
+
+  const paginatedFlashcards = filteredFlashcards.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
@@ -75,6 +98,40 @@ export default function FlashcardList({ flashcards, onDeleted }: Props) {
         <Typography variant="h6" gutterBottom>
           Saved words
         </Typography>
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={2}
+          sx={{ mb: 2 }}
+        >
+          <TextField
+            size="small"
+            placeholder="Search words..."
+            value={searchFilter}
+            onChange={(e) => {
+              setSearchFilter(e.target.value);
+              setPage(0);
+            }}
+            fullWidth
+          />
+          <FormControl size="small" sx={{ minWidth: 150 }}>
+            <InputLabel>Language</InputLabel>
+            <Select
+              value={languageFilter}
+              label="Language"
+              onChange={(e) => {
+                setLanguageFilter(e.target.value);
+                setPage(0);
+              }}
+            >
+              <MenuItem value="all">All languages</MenuItem>
+              {availableLanguages.map((lang) => (
+                <MenuItem key={lang} value={lang}>
+                  {lang?.toUpperCase()}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Stack>
         <Table size="small">
           <TableHead>
             <TableRow>
@@ -85,11 +142,13 @@ export default function FlashcardList({ flashcards, onDeleted }: Props) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {!flashcards.length ? (
+            {!filteredFlashcards.length ? (
               <TableRow>
                 <TableCell colSpan={4}>
                   <Alert severity="warning" icon={<WarningAmberIcon />}>
-                    No flashcards yet. Add your first word above.
+                    {flashcards.length === 0
+                      ? "No flashcards yet. Add your first word above."
+                      : "No flashcards match your filters."}
                   </Alert>
                 </TableCell>
               </TableRow>
@@ -157,7 +216,7 @@ export default function FlashcardList({ flashcards, onDeleted }: Props) {
             )}
           </TableBody>
         </Table>
-        {flashcards.length > 0 && (
+        {filteredFlashcards.length > 0 && (
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
             <FormControl size="small" sx={{ minWidth: 120 }}>
               <InputLabel>Words per page</InputLabel>
@@ -181,7 +240,7 @@ export default function FlashcardList({ flashcards, onDeleted }: Props) {
             </FormControl>
             <TablePagination
               component="div"
-              count={flashcards.length}
+              count={filteredFlashcards.length}
               page={page}
               onPageChange={handleChangePage}
               rowsPerPage={rowsPerPage}

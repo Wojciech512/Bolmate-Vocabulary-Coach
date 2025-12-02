@@ -2,6 +2,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import TextFieldsIcon from "@mui/icons-material/TextFields";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import {
   Alert,
   Box,
@@ -9,9 +10,6 @@ import {
   Card,
   CardContent,
   Divider,
-  List,
-  ListItem,
-  ListItemText,
   Stack,
   TextField,
   Typography,
@@ -24,6 +22,16 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  IconButton,
+  Tooltip,
+  List,
+  ListItem,
+  ListItemText,
 } from "@mui/material";
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
@@ -55,6 +63,8 @@ export default function InterpretForm() {
   const [addingAll, setAddingAll] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [searchFilter, setSearchFilter] = useState("");
+  const [languageFilter, setLanguageFilter] = useState<string>("all");
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setUploadedFiles(acceptedFiles);
@@ -83,6 +93,29 @@ export default function InterpretForm() {
     setRowsPerPage(value);
     setPage(0);
   };
+
+  const filteredResults = results.filter((item) => {
+    const matchesSearch =
+      !searchFilter ||
+      item.source_word.toLowerCase().includes(searchFilter.toLowerCase()) ||
+      item.translated_word.toLowerCase().includes(searchFilter.toLowerCase());
+
+    const matchesLanguage =
+      languageFilter === "all" ||
+      item.source_language === languageFilter ||
+      item.native_language === languageFilter;
+
+    return matchesSearch && matchesLanguage;
+  });
+
+  const availableLanguages = Array.from(
+    new Set(
+      results.flatMap((item) => [
+        item.source_language,
+        item.native_language || nativeLanguage,
+      ])
+    )
+  ).filter(Boolean);
 
   const handleInterpret = async () => {
     setLoading(true);
@@ -296,68 +329,143 @@ export default function InterpretForm() {
           {results.length > 0 && (
             <Box>
               <Divider sx={{ my: 1 }} />
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={2}
+                sx={{ mb: 2 }}
+              >
+                <TextField
+                  size="small"
+                  placeholder="Search words..."
+                  value={searchFilter}
+                  onChange={(e) => {
+                    setSearchFilter(e.target.value);
+                    setPage(0);
+                  }}
+                  fullWidth
+                />
+                <FormControl size="small" sx={{ minWidth: 150 }}>
+                  <InputLabel>Language</InputLabel>
+                  <Select
+                    value={languageFilter}
+                    label="Language"
+                    onChange={(e) => {
+                      setLanguageFilter(e.target.value);
+                      setPage(0);
+                    }}
+                  >
+                    <MenuItem value="all">All languages</MenuItem>
+                    {availableLanguages.map((lang) => (
+                      <MenuItem key={lang} value={lang}>
+                        {lang?.toUpperCase()}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Stack>
               <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                Suggested flashcards ({results.length})
+                Suggested flashcards ({filteredResults.length})
               </Typography>
-              <List dense>
-                {results
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((item, idx) => {
-                    const actualIdx = page * rowsPerPage + idx;
-                    const isSameLanguage = item.source_language === nativeLanguage;
-                    return (
-                      <ListItem
-                        key={`${item.source_word}-${actualIdx}`}
-                        divider
-                        secondaryAction={
-                          <Button
-                            size="small"
-                            variant={addedIds.has(actualIdx) ? "outlined" : "contained"}
-                            color={addedIds.has(actualIdx) ? "success" : "primary"}
-                            onClick={() => handleAddFlashcard(item, actualIdx)}
-                            disabled={addingIds.has(actualIdx) || addedIds.has(actualIdx)}
-                          >
-                            {addingIds.has(actualIdx)
-                              ? "Adding..."
-                              : addedIds.has(actualIdx)
-                                ? "Added"
-                                : "Add"}
-                          </Button>
-                        }
-                        sx={{
-                          bgcolor: isSameLanguage ? "warning.50" : "transparent",
-                        }}
-                      >
-                        <ListItemText
-                          primary={
-                            <Box>
-                              {`${item.source_word} → ${item.translated_word} (${item.native_language || nativeLanguage})`}
-                              {isSameLanguage && (
-                                <Typography
-                                  component="span"
-                                  variant="caption"
-                                  color="warning.main"
-                                  sx={{ ml: 1, fontWeight: 600 }}
-                                >
-                                  ⚠ Same as target language
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Source</TableCell>
+                    <TableCell>Target translation</TableCell>
+                    <TableCell align="right">Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {filteredResults
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((item, idx) => {
+                      const actualIdx =
+                        results.findIndex(
+                          (r) =>
+                            r.source_word === item.source_word &&
+                            r.translated_word === item.translated_word
+                        ) || idx;
+                      const isSameLanguage = item.source_language === nativeLanguage;
+                      return (
+                        <TableRow
+                          key={`${item.source_word}-${actualIdx}`}
+                          hover
+                          sx={{
+                            bgcolor: isSameLanguage ? "warning.50" : "transparent",
+                          }}
+                        >
+                          <TableCell width="20%">
+                            <Stack spacing={0.5}>
+                              <Typography variant="subtitle2">
+                                {item.source_word}
+                              </Typography>
+                              <Typography variant="caption" color="text.secondary">
+                                {item.source_language?.toUpperCase()}
+                              </Typography>
+                            </Stack>
+                          </TableCell>
+                          <TableCell width="65%">
+                            <Stack spacing={0.5}>
+                              <Box>
+                                <Typography display="inline">
+                                  {item.translated_word}
+                                </Typography>
+                                {isSameLanguage && (
+                                  <Typography
+                                    component="span"
+                                    variant="caption"
+                                    color="warning.main"
+                                    sx={{ ml: 1, fontWeight: 600 }}
+                                  >
+                                    ⚠ Same as target language
+                                  </Typography>
+                                )}
+                              </Box>
+                              <Typography variant="caption" color="text.secondary">
+                                {(item.native_language || nativeLanguage).toUpperCase()}
+                              </Typography>
+                              {item.example_sentence && (
+                                <Typography variant="body2" color="text.secondary">
+                                  {item.example_sentence}
+                                  {item.example_sentence_translated &&
+                                    ` — ${item.example_sentence_translated}`}
                                 </Typography>
                               )}
-                            </Box>
-                          }
-                          secondary={
-                            item.example_sentence
-                              ? `${item.example_sentence}${
-                                  item.example_sentence_translated
-                                    ? ` — ${item.example_sentence_translated}`
-                                    : ""
-                                }`
-                              : undefined
-                          }
-                        />
-                      </ListItem>
-                    );
-                  })}
-              </List>
+                            </Stack>
+                          </TableCell>
+                          <TableCell align="right" width="15%">
+                            <Tooltip
+                              title={
+                                addedIds.has(actualIdx)
+                                  ? "Already added"
+                                  : "Add flashcard"
+                              }
+                            >
+                              <span>
+                                <IconButton
+                                  color={
+                                    addedIds.has(actualIdx) ? "success" : "primary"
+                                  }
+                                  onClick={() => handleAddFlashcard(item, actualIdx)}
+                                  disabled={
+                                    addingIds.has(actualIdx) || addedIds.has(actualIdx)
+                                  }
+                                >
+                                  {addingIds.has(actualIdx) ? (
+                                    <CircularProgress size={20} />
+                                  ) : addedIds.has(actualIdx) ? (
+                                    <CheckCircleIcon />
+                                  ) : (
+                                    <AddIcon />
+                                  )}
+                                </IconButton>
+                              </span>
+                            </Tooltip>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                </TableBody>
+              </Table>
               <Box
                 sx={{
                   display: "flex",
@@ -385,7 +493,7 @@ export default function InterpretForm() {
                 </FormControl>
                 <TablePagination
                   component="div"
-                  count={results.length}
+                  count={filteredResults.length}
                   page={page}
                   onPageChange={handleChangePage}
                   rowsPerPage={rowsPerPage}

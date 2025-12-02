@@ -152,6 +152,8 @@ export type DeleteResponse = {
 // TODO ustandaryzowanie przycisków i wyglądu linków w aplikacji
 // TODO filtrowanie w tabelach
 // TODO aktualizacja dokumentacji
+// TODO przy dodawaniu bardzo dużo requestów jest wykonywanych należy to dostosować
+// TODO dodać weryfikacje powtarzających się aagadnień za pomocą AI
 
 // TODO generowanie memów tak aby zapamiętywać słowa?
 // TODO quiz w postaci obracanych kart (animacje)
