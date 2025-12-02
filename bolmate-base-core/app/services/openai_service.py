@@ -144,10 +144,22 @@ def interpret_text_with_ai(text: str, native_language: str) -> List[Dict[str, An
         items = parsed.get("items", []) if isinstance(parsed, dict) else []
 
         # Filter out items where source_language == native_language
-        filtered_items = [
-            item for item in items
-            if item.get("source_language", "").lower() != native_language.lower()
-        ]
+        # Also ensure source_word != translated_word to catch untranslated items
+        filtered_items = []
+        for item in items:
+            source_lang = item.get("source_language", "").lower()
+            source_word = item.get("source_word", "").strip()
+            translated_word = item.get("translated_word", "").strip()
+
+            # Skip if source language matches native language
+            if source_lang == native_language.lower():
+                continue
+
+            # Skip if source and translation are identical (untranslated)
+            if source_word.lower() == translated_word.lower():
+                continue
+
+            filtered_items.append(item)
 
         return filtered_items
     except Exception as exc:  # pragma: no cover
@@ -273,10 +285,22 @@ def _interpret_image_with_vision(
         items = parsed.get("items", []) if isinstance(parsed, dict) else []
 
         # Filter out items where source_language == native_language
-        filtered_items = [
-            item for item in items
-            if item.get("source_language", "").lower() != native_language.lower()
-        ]
+        # Also ensure source_word != translated_word to catch untranslated items
+        filtered_items = []
+        for item in items:
+            source_lang = item.get("source_language", "").lower()
+            source_word = item.get("source_word", "").strip()
+            translated_word = item.get("translated_word", "").strip()
+
+            # Skip if source language matches native language
+            if source_lang == native_language.lower():
+                continue
+
+            # Skip if source and translation are identical (untranslated)
+            if source_word.lower() == translated_word.lower():
+                continue
+
+            filtered_items.append(item)
 
         return filtered_items
     except Exception as exc:

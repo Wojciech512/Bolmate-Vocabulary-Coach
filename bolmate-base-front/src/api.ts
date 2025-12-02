@@ -165,9 +165,7 @@ export type BulkCreateFlashcardsResponse = {
 // TODO przy dodawaniu bardzo dużo requestów jest wykonywanych należy to dostosować
 // TODO dodać weryfikacje powtarzających się aagadnień za pomocą AI
 
-// TODO generowanie memów tak aby zapamiętywać słowa?
-// TODO quiz w postaci obracanych kart (animacje)
-// TODO konfetti z boków jeżeli przejdzie się przez sekwencje 10 słów dobrze pod rząd
+// TODO konfetti z boków jeżeli przejdzie się przez sekwencje 3 5 i 10 słów dobrze pod rząd, progress barr widoczny nad odpowiedziami zapełnia się po każdej poprawej odpowiedzi ubywa gdy odpowie się źle
 // TODO responsywność mobilne
 export const fetchFlashcards = () => api.get<Flashcard[]>("/api/flashcards");
 
