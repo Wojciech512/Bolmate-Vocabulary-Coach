@@ -86,9 +86,27 @@ def switch_language():
         )
         translated_by_id = {item.get("id"): item for item in translated_payload}
 
+        # Check if any cards would violate unique constraint
+        new_language_lower = data.target_language.lower()
+
+        for card in to_translate:
+            # Check for potential duplicates
+            existing = session.query(Flashcard).filter(
+                Flashcard.source_word == card.source_word,
+                Flashcard.source_language == card.source_language,
+                Flashcard.native_language == new_language_lower,
+                Flashcard.id != card.id
+            ).first()
+
+            if existing:
+                return jsonify({
+                    "error": "Cannot switch language - duplicate flashcard would be created",
+                    "details": f"Flashcard '{card.source_word}' already exists with target language '{new_language_lower}'"
+                }), 409
+
         for card in to_translate:
             payload = translated_by_id.get(card.id, {})
-            card.native_language = data.target_language
+            card.native_language = new_language_lower
             card.translated_word = payload.get("translated_word") or card.translated_word
             if payload.get("example_sentence") and not card.example_sentence:
                 card.example_sentence = payload["example_sentence"]

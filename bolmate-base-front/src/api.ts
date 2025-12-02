@@ -127,16 +127,20 @@ export type SwitchLanguageResponse = {
 export type DeleteResponse = {
   status: string;
 };
-
+// TODO "Failed to switch language. Please try again." oraz łądowanie w postaci pojawiającego się snackbara
+// TODO sticky header
+// TODO sprawdzanie duplikatów i agregowanie podobnych słów
+// TODO paginacja w flashcards
+// TODO rozróżnienie zwrotów od pojedyńczych słów
 // TODO selektor języka na który mają być wykonywane tłumaczenia - przy zmianie języka w aplikacji wszystkie obecne fiszki zostają przetłumaczone na wybrany język
 // TODO opisy aplikacji że jest uniwersalna dla każdego języka
 // TODO interpretowanie danych z plików tekstowych (.pdf, .docx itd.), zdjęciowych w Interpret (OCR & AI)
-// TODO skopiowanie szaty graficznej https://bolmate.nl/
+// TODO skopiowanie przycisków z https://bolmate.nl/
 // TODO quiz w postaci obracanych kart (animacje)
-// TODO logo "Bolmate - Language tutor"
 // TODO testy
-// TODO responsywność
-
+// TODO wszystkie teksty w aplikacji po angielsku
+// TODO konfetti jeżeli przejdzie się przez sekwencje 10 słów dobrze pod rząd
+// TODO responsywność mobilne
 export const fetchFlashcards = () => api.get<Flashcard[]>("/api/flashcards");
 
 export const createFlashcard = (data: CreateFlashcardInput) =>

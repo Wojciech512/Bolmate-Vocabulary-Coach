@@ -7,6 +7,19 @@ from pydantic import BaseModel, Field
 from app.schemas.flashcard import FlashcardResponse
 
 
+class Language(BaseModel):
+    """Single language representation."""
+
+    code: str
+    name: str
+
+
+class LanguagesResponse(BaseModel):
+    """Response containing list of available languages."""
+
+    languages: List[Language]
+
+
 class SwitchLanguageRequest(BaseModel):
     """Payload for translating flashcards into a new target language."""
 

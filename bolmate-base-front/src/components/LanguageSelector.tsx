@@ -32,12 +32,12 @@ const LanguageSelector = () => {
       const response = await switchToLanguage(newLang);
       if (response) {
         setStatus(
-          `Przetłumaczono ${response.meta.translated_count} fiszek (pominięto ${response.meta.skipped_count}).`,
+          `Translated ${response.meta.translated_count} flashcard${response.meta.translated_count !== 1 ? 's' : ''} (skipped ${response.meta.skipped_count}).`,
         );
       }
     } catch (error) {
       console.error("Language switch failed", error);
-      setStatus("Nie udało się przełączyć języka. Spróbuj ponownie.");
+      setStatus("Failed to switch language. Please try again.");
       setSelected(nativeLanguage);
     }
   };
@@ -46,10 +46,10 @@ const LanguageSelector = () => {
     <Box display="flex" alignItems="center" gap={1}>
       <LanguageIcon color="action" />
       <FormControl size="small" sx={{ minWidth: 170 }}>
-        <InputLabel id="language-selector-label">Język docelowy</InputLabel>
+        <InputLabel id="language-selector-label">Target Language</InputLabel>
         <Select
           labelId="language-selector-label"
-          label="Język docelowy"
+          label="Target Language"
           value={selected}
           disabled={!options.length || isSwitching}
           onChange={handleChange}
@@ -63,7 +63,7 @@ const LanguageSelector = () => {
       </FormControl>
       {isSwitching && <CircularProgress size={20} thickness={5} />}
       {status && (
-        <Tooltip title="Ostatnia synchronizacja fiszek">
+        <Tooltip title="Last flashcard synchronization">
           <Typography variant="caption" color="text.secondary">
             {status}
           </Typography>
