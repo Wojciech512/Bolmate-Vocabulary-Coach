@@ -1,6 +1,16 @@
-import { AppBar, Box, Button, Container, Toolbar, Typography } from "@mui/material";
+import {
+  AppBar,
+  Box,
+  Button,
+  Container,
+  Toolbar,
+  Typography,
+  Switch,
+  FormControlLabel,
+} from "@mui/material";
 import { Link as RouterLink, useLocation } from "react-router-dom";
 import LanguageSelector from "./LanguageSelector";
+import { useThemeMode } from "../context/ThemeContext";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -8,6 +18,7 @@ interface LayoutProps {
 
 function Layout({ children }: LayoutProps) {
   const location = useLocation();
+  const { darkMode, toggleDarkMode } = useThemeMode();
 
   const navItems = [
     { label: "Home", path: "/" },
@@ -23,7 +34,14 @@ function Layout({ children }: LayoutProps) {
       minHeight="100vh"
       bgcolor="background.default"
     >
-      <AppBar position="sticky" sx={{ bgcolor: "white" }}>
+      <AppBar
+        position="sticky"
+        elevation={2}
+        sx={{
+          bgcolor: "background.paper",
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
+        }}
+      >
         <Toolbar sx={{ gap: 2 }}>
           <Box sx={{ position: "relative", display: "inline-block" }}>
             <Box
@@ -50,6 +68,13 @@ function Layout({ children }: LayoutProps) {
             </Typography>
           </Box>
           <Box sx={{ flexGrow: 1 }} />
+          <FormControlLabel
+            control={
+              <Switch checked={darkMode} onChange={toggleDarkMode} color="primary" />
+            }
+            label="Dark"
+            sx={{ mr: 2, color: "text.primary" }}
+          />
           <LanguageSelector />
           {navItems.map((item) => {
             const isActive =
@@ -65,7 +90,7 @@ function Layout({ children }: LayoutProps) {
                 sx={{
                   textTransform: "none",
                   fontWeight: isActive ? 700 : 500,
-                  color: isActive ? undefined : "#0A1B33",
+                  color: isActive ? undefined : "text.primary",
                 }}
               >
                 {item.label}
@@ -79,7 +104,7 @@ function Layout({ children }: LayoutProps) {
         {children}
       </Container>
 
-      <Box component="footer" sx={{ py: 3, bgcolor: "grey.100" }}>
+      <Box component="footer" sx={{ py: 3, bgcolor: "background.paper" }}>
         <Container>
           <Typography variant="body2" color="text.secondary" align="center">
             React + Flask + PostgreSQL vocabulary coach
