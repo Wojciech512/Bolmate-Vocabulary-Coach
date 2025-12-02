@@ -149,6 +149,8 @@ export type DeleteResponse = {
   status: string;
 };
 // TODO healthchecks dla serwisów
+// TODO ustandaryzowanie przycisków i wyglądu linków w aplikacji
+// TODO filtrowanie w tabelach
 // TODO aktualizacja dokumentacji
 
 // TODO generowanie memów tak aby zapamiętywać słowa?

@@ -19,6 +19,11 @@ import {
   ToggleButtonGroup,
   ToggleButton,
   Paper,
+  TablePagination,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
@@ -34,6 +39,9 @@ import { useSnackbar } from "../context/SnackbarContext";
 type InputMode = "text" | "file";
 
 export default function InterpretForm() {
+  const minPerPage = Number(import.meta.env.VITE_FLASHCARDS_MIN_PER_PAGE) || 5;
+  const maxPerPage = Number(import.meta.env.VITE_FLASHCARDS_MAX_PER_PAGE) || 50;
+
   const { nativeLanguage } = useLanguage();
   const { showSuccess } = useSnackbar();
   const [inputMode, setInputMode] = useState<InputMode>("text");
@@ -45,6 +53,8 @@ export default function InterpretForm() {
   const [addingIds, setAddingIds] = useState<Set<number>>(new Set());
   const [addedIds, setAddedIds] = useState<Set<number>>(new Set());
   const [addingAll, setAddingAll] = useState(false);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setUploadedFiles(acceptedFiles);
@@ -65,10 +75,20 @@ export default function InterpretForm() {
     multiple: true,
   });
 
+  const handleChangePage = (_event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (value: number) => {
+    setRowsPerPage(value);
+    setPage(0);
+  };
+
   const handleInterpret = async () => {
     setLoading(true);
     setError(null);
     setAddedIds(new Set());
+    setPage(0);
     try {
       if (inputMode === "text") {
         const res = await interpretText(input, nativeLanguage);
@@ -280,61 +300,102 @@ export default function InterpretForm() {
                 Suggested flashcards ({results.length})
               </Typography>
               <List dense>
-                {results.map((item, idx) => {
-                  const isSameLanguage = item.source_language === nativeLanguage;
-                  return (
-                    <ListItem
-                      key={`${item.source_word}-${idx}`}
-                      divider
-                      secondaryAction={
-                        <Button
-                          size="small"
-                          variant={addedIds.has(idx) ? "outlined" : "contained"}
-                          color={addedIds.has(idx) ? "success" : "primary"}
-                          onClick={() => handleAddFlashcard(item, idx)}
-                          disabled={addingIds.has(idx) || addedIds.has(idx)}
-                        >
-                          {addingIds.has(idx)
-                            ? "Adding..."
-                            : addedIds.has(idx)
-                              ? "Added"
-                              : "Add"}
-                        </Button>
-                      }
-                      sx={{
-                        bgcolor: isSameLanguage ? "warning.50" : "transparent",
-                      }}
-                    >
-                      <ListItemText
-                        primary={
-                          <Box>
-                            {`${item.source_word} → ${item.translated_word} (${item.native_language || nativeLanguage})`}
-                            {isSameLanguage && (
-                              <Typography
-                                component="span"
-                                variant="caption"
-                                color="warning.main"
-                                sx={{ ml: 1, fontWeight: 600 }}
-                              >
-                                ⚠ Same as target language
-                              </Typography>
-                            )}
-                          </Box>
+                {results
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((item, idx) => {
+                    const actualIdx = page * rowsPerPage + idx;
+                    const isSameLanguage = item.source_language === nativeLanguage;
+                    return (
+                      <ListItem
+                        key={`${item.source_word}-${actualIdx}`}
+                        divider
+                        secondaryAction={
+                          <Button
+                            size="small"
+                            variant={addedIds.has(actualIdx) ? "outlined" : "contained"}
+                            color={addedIds.has(actualIdx) ? "success" : "primary"}
+                            onClick={() => handleAddFlashcard(item, actualIdx)}
+                            disabled={addingIds.has(actualIdx) || addedIds.has(actualIdx)}
+                          >
+                            {addingIds.has(actualIdx)
+                              ? "Adding..."
+                              : addedIds.has(actualIdx)
+                                ? "Added"
+                                : "Add"}
+                          </Button>
                         }
-                        secondary={
-                          item.example_sentence
-                            ? `${item.example_sentence}${
-                                item.example_sentence_translated
-                                  ? ` — ${item.example_sentence_translated}`
-                                  : ""
-                              }`
-                            : undefined
-                        }
-                      />
-                    </ListItem>
-                  );
-                })}
+                        sx={{
+                          bgcolor: isSameLanguage ? "warning.50" : "transparent",
+                        }}
+                      >
+                        <ListItemText
+                          primary={
+                            <Box>
+                              {`${item.source_word} → ${item.translated_word} (${item.native_language || nativeLanguage})`}
+                              {isSameLanguage && (
+                                <Typography
+                                  component="span"
+                                  variant="caption"
+                                  color="warning.main"
+                                  sx={{ ml: 1, fontWeight: 600 }}
+                                >
+                                  ⚠ Same as target language
+                                </Typography>
+                              )}
+                            </Box>
+                          }
+                          secondary={
+                            item.example_sentence
+                              ? `${item.example_sentence}${
+                                  item.example_sentence_translated
+                                    ? ` — ${item.example_sentence_translated}`
+                                    : ""
+                                }`
+                              : undefined
+                          }
+                        />
+                      </ListItem>
+                    );
+                  })}
               </List>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mt: 2,
+                }}
+              >
+                <FormControl size="small" sx={{ minWidth: 120 }}>
+                  <InputLabel>Words per page</InputLabel>
+                  <Select
+                    value={rowsPerPage}
+                    label="Words per page"
+                    onChange={(e) => handleChangeRowsPerPage(Number(e.target.value))}
+                  >
+                    {Array.from(
+                      { length: Math.floor((maxPerPage - minPerPage) / 5) + 1 },
+                      (_, i) => minPerPage + i * 5,
+                    ).map((value) => (
+                      <MenuItem key={value} value={value}>
+                        {value}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <TablePagination
+                  component="div"
+                  count={results.length}
+                  page={page}
+                  onPageChange={handleChangePage}
+                  rowsPerPage={rowsPerPage}
+                  onRowsPerPageChange={() => {}}
+                  rowsPerPageOptions={[]}
+                  labelDisplayedRows={({ from, to, count }) =>
+                    `${from}-${to} of ${count}`
+                  }
+                />
+              </Box>
             </Box>
           )}
         </Stack>
