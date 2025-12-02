@@ -133,7 +133,6 @@ export type DeleteResponse = {
 // TODO Daily quiz powinien określać w jakim języku słowa oczekuje, jeżeli jests więcej niż 2 będzie informować że istnieje zapisanych wiele opcji
 // TODO błędy aplikacji przedstawioane w podstaci snackbarów
 // TODO poprawne operacje przedstawiane w postaci snackbarów
-// TODO "Flashcard already exists for this language pair." powinno dokładać tłumaczenie do listy
 // TODO sprawdzanie duplikatów i agregowanie podobnych słów
 // TODO paginacja w flashcards
 // TODO rozróżnienie zwrotów od pojedyńczych słów

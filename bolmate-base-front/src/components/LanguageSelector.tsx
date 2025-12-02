@@ -43,7 +43,7 @@ const LanguageSelector = () => {
         message: `Target language changed to ${languages.find((l) => l.code === newLang)?.label || newLang}.`,
         severity: "success",
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error("Language switch failed", error);
       setSnackbar({
         open: true,

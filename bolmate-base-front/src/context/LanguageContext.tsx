@@ -8,7 +8,8 @@ type LanguageContextValue = {
   nativeLanguage: string;
   setNativeLanguage: (code: string) => void;
   languages: Language[];
-  switchToLanguage: (code: string) => void;
+  isSwitching: boolean;
+  switchToLanguage: (code: string) => Promise<void>;
 };
 
 const LanguageContext = createContext<LanguageContextValue | undefined>(undefined);
@@ -20,6 +21,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
     return localStorage.getItem("nativeLanguage") || "pl";
   });
   const [languages, setLanguages] = useState<Language[]>([]);
+  const [isSwitching, setIsSwitching] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("nativeLanguage", nativeLanguage);
@@ -33,9 +35,15 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const setNativeLanguage = (code: string) => setNativeLanguageState(code);
 
-  const switchToLanguage = (code: string) => {
+  const switchToLanguage = async (code: string) => {
     if (code) {
-      setNativeLanguage(code);
+      setIsSwitching(true);
+      try {
+        setNativeLanguage(code);
+        await new Promise((resolve) => setTimeout(resolve, 300));
+      } finally {
+        setIsSwitching(false);
+      }
     }
   };
 
@@ -45,6 +53,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
         nativeLanguage,
         setNativeLanguage,
         languages,
+        isSwitching,
         switchToLanguage,
       }}
     >
