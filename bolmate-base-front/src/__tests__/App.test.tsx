@@ -3,20 +3,27 @@ import { MemoryRouter } from "react-router-dom";
 import App from "../App";
 import { LanguageProvider } from "../context/LanguageContext";
 import { ThemeProvider } from "../context/ThemeContext";
+import { LoadingProvider } from "../context/LoadingContext";
+import { SnackbarProvider } from "../context/SnackbarContext";
 
 vi.mock("../api", () => ({
   fetchLanguages: () => Promise.resolve({ data: { languages: [] } }),
+  setGlobalErrorHandler: vi.fn(),
 }));
 
 describe("App routing", () => {
   const renderApp = (initialEntries = ["/"]) =>
     render(
       <ThemeProvider>
-        <LanguageProvider>
-          <MemoryRouter initialEntries={initialEntries}>
-            <App />
-          </MemoryRouter>
-        </LanguageProvider>
+        <SnackbarProvider>
+          <LoadingProvider>
+            <LanguageProvider>
+              <MemoryRouter initialEntries={initialEntries}>
+                <App />
+              </MemoryRouter>
+            </LanguageProvider>
+          </LoadingProvider>
+        </SnackbarProvider>
       </ThemeProvider>
     );
 

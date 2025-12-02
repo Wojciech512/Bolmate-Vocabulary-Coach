@@ -1,6 +1,8 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import FlashcardForm from "../components/FlashcardForm";
+import { LoadingProvider } from "../context/LoadingContext";
+import { SnackbarProvider } from "../context/SnackbarContext";
 
 const onCreated = vi.fn();
 const createFlashcard = vi.fn(() => Promise.resolve({ data: {} }));
@@ -31,8 +33,15 @@ describe("FlashcardForm", () => {
     vi.clearAllMocks();
   });
 
+  const renderWithProviders = (component: React.ReactElement) =>
+    render(
+      <SnackbarProvider>
+        <LoadingProvider>{component}</LoadingProvider>
+      </SnackbarProvider>
+    );
+
   it("validates required fields", async () => {
-    render(<FlashcardForm onCreated={onCreated} />);
+    renderWithProviders(<FlashcardForm onCreated={onCreated} />);
 
     await userEvent.click(screen.getByRole("button", { name: /save word/i }));
 
@@ -43,7 +52,7 @@ describe("FlashcardForm", () => {
   });
 
   it("submits a new flashcard and resets fields", async () => {
-    render(<FlashcardForm onCreated={onCreated} />);
+    renderWithProviders(<FlashcardForm onCreated={onCreated} />);
 
     await userEvent.type(screen.getByLabelText(/source word/i), "hola");
     await userEvent.type(screen.getByLabelText(/translation/i), "cześć");
@@ -55,7 +64,7 @@ describe("FlashcardForm", () => {
   });
 
   it("loads language options from the API", async () => {
-    render(<FlashcardForm onCreated={onCreated} />);
+    renderWithProviders(<FlashcardForm onCreated={onCreated} />);
 
     await waitFor(() => expect(fetchLanguages).toHaveBeenCalled());
     await userEvent.click(screen.getByLabelText(/source language/i));
