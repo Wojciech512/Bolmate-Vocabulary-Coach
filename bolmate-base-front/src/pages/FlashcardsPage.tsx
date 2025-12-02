@@ -1,3 +1,4 @@
+import { Box, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import FlashcardForm from "../components/FlashcardForm";
 import FlashcardList from "../components/FlashcardList";
@@ -17,16 +18,20 @@ export default function FlashcardsPage() {
   }, []);
 
   return (
-    <div className="page">
-      <div className="page-header">
-        <div>
-          <h2>Your notebook</h2>
-          <p className="muted">Add Spanish words with translations, then practice them.</p>
-        </div>
-      </div>
-      <FlashcardForm onCreated={loadFlashcards} />
-      <FlashcardList flashcards={flashcards} onDeleted={loadFlashcards} />
-    </div>
+    <Box>
+      <Box mb={3}>
+        <Typography variant="h5" gutterBottom>
+          Your notebook
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Add Spanish words with translations, then practice them.
+        </Typography>
+      </Box>
+      <Stack spacing={2}>
+        <FlashcardForm onCreated={loadFlashcards} />
+        <FlashcardList flashcards={flashcards} onDeleted={loadFlashcards} />
+      </Stack>
+    </Box>
   );
 }
 

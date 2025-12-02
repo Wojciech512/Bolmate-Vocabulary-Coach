@@ -1,3 +1,4 @@
+import { Alert, Button, Card, CardActions, CardContent, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { createFlashcard } from "../api";
 import { useLanguage } from "../context/LanguageContext";
@@ -39,24 +40,49 @@ export default function FlashcardForm({ onCreated }: Props) {
     }
   };
 
+  const hasFieldError = Boolean(error);
+
   return (
-    <form className="card" onSubmit={handleSubmit}>
-      <h3>Add a new word</h3>
-      <div className="form-row">
-        <label>Spanish / Source word</label>
-        <input value={sourceWord} onChange={(e) => setSourceWord(e.target.value)} />
-      </div>
-      <div className="form-row">
-        <label>Translation ({nativeLanguage.toUpperCase()})</label>
-        <input value={translation} onChange={(e) => setTranslation(e.target.value)} />
-      </div>
-      <div className="form-row">
-        <label>Source language</label>
-        <input value={sourceLanguage} onChange={(e) => setSourceLanguage(e.target.value)} />
-      </div>
-      {error && <p className="error">{error}</p>}
-      <button type="submit" disabled={loading}>{loading ? "Saving..." : "Save word"}</button>
-    </form>
+    <Card variant="outlined" sx={{ mb: 3 }} component="form" onSubmit={handleSubmit}>
+      <CardContent>
+        <Typography variant="h6" gutterBottom>
+          Add a new word
+        </Typography>
+        <Stack spacing={2}>
+          <TextField
+            label="Spanish / Source word"
+            value={sourceWord}
+            onChange={(e) => setSourceWord(e.target.value)}
+            required
+            error={hasFieldError && !sourceWord}
+            helperText={hasFieldError && !sourceWord ? "Spanish word is required" : ""}
+          />
+          <TextField
+            label={`Translation (${nativeLanguage.toUpperCase()})`}
+            value={translation}
+            onChange={(e) => setTranslation(e.target.value)}
+            required
+            error={hasFieldError && !translation}
+            helperText={hasFieldError && !translation ? "Translation is required" : ""}
+          />
+          <TextField
+            label="Source language"
+            value={sourceLanguage}
+            onChange={(e) => setSourceLanguage(e.target.value)}
+          />
+          {error && sourceWord && translation && (
+            <Alert severity="error" variant="outlined">
+              {error}
+            </Alert>
+          )}
+        </Stack>
+      </CardContent>
+      <CardActions sx={{ px: 3, pb: 3 }}>
+        <Button type="submit" variant="contained" disabled={loading} fullWidth>
+          {loading ? "Saving..." : "Save word"}
+        </Button>
+      </CardActions>
+    </Card>
   );
 }
 

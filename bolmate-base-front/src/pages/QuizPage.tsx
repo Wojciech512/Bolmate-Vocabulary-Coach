@@ -1,16 +1,19 @@
+import { Box, Typography } from "@mui/material";
 import QuizPanel from "../components/QuizPanel";
 
 export default function QuizPage() {
   return (
-    <div className="page">
-      <div className="page-header">
-        <div>
-          <h2>Daily quiz</h2>
-          <p className="muted">Translate one word at a time, track your progress, and get AI hints.</p>
-        </div>
-      </div>
+    <Box>
+      <Box mb={3}>
+        <Typography variant="h5" gutterBottom>
+          Daily quiz
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Translate one word at a time, track your progress, and get AI hints.
+        </Typography>
+      </Box>
       <QuizPanel />
-    </div>
+    </Box>
   );
 }
 
