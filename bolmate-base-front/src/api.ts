@@ -108,6 +108,22 @@ export type LanguagesResponse = {
   languages: Language[];
 };
 
+export type SwitchLanguagePayload = {
+  target_language: string;
+  flashcard_ids?: number[];
+  force_retranslate?: boolean;
+};
+
+export type SwitchLanguageResponse = {
+  flashcards: Flashcard[];
+  meta: {
+    target_language: string;
+    translated_count: number;
+    skipped_count: number;
+    force_retranslate: boolean;
+  };
+};
+
 export type DeleteResponse = {
   status: string;
 };
@@ -146,5 +162,8 @@ export const interpretText = (text: string, native_language: string) =>
 
 export const fetchLanguages = () =>
   api.get<LanguagesResponse>("/api/languages");
+
+export const switchLanguage = (payload: SwitchLanguagePayload) =>
+  api.post<SwitchLanguageResponse>("/api/languages/switch", payload);
 
 export default api;

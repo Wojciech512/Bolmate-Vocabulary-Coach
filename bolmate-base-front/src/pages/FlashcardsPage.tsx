@@ -4,9 +4,11 @@ import FlashcardForm from "../components/FlashcardForm";
 import FlashcardList from "../components/FlashcardList";
 import { fetchFlashcards } from "../api";
 import { Flashcard } from "../types";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function FlashcardsPage() {
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
+  const { nativeLanguage } = useLanguage();
 
   const loadFlashcards = async () => {
     const res = await fetchFlashcards();
@@ -15,7 +17,7 @@ export default function FlashcardsPage() {
 
   useEffect(() => {
     loadFlashcards();
-  }, []);
+  }, [nativeLanguage]);
 
   return (
     <Box>

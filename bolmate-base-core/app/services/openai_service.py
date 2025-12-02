@@ -135,6 +135,58 @@ def interpret_text_with_ai(text: str, native_language: str) -> List[Dict[str, An
         return []
 
 
+def translate_flashcards(cards: List[Dict[str, Any]], target_language: str) -> List[Dict[str, Any]]:
+    """Translate provided flashcards to the target language while keeping structure intact."""
+
+    client = _get_client()
+    if not client or not cards:
+        # Fallback: keep the structure and simply mark the new language without altering content.
+        return [
+            {
+                **card,
+                "native_language": target_language,
+            }
+            for card in cards
+        ]
+
+    settings = get_settings()
+    system_prompt = (
+        "You are a multilingual flashcard translator. Preserve each flashcard's id and structure. "
+        "Translate all learner-facing text fields (e.g., translated_word, example_sentence, "
+        "example_sentence_translated, notes, hints, explanations) into the target language while "
+        "keeping source_word and source_language unchanged. Return JSON object with 'flashcards' "
+        "array in the same order."
+    )
+
+    try:
+        response = client.chat.completions.create(
+            model=settings.openai_model,
+            temperature=settings.openai_temperature,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {
+                    "role": "user",
+                    "content": f"Target language: {target_language}. Flashcards: {cards}",
+                },
+            ],
+            response_format={"type": "json_object"},
+        )
+        message = response.choices[0].message.content
+        parsed = _safe_parse_json(message)
+        if isinstance(parsed, dict) and isinstance(parsed.get("flashcards"), list):
+            return parsed["flashcards"]
+    except Exception as exc:  # pragma: no cover - external dependency
+        logger.exception("Translation failed: %s", exc)
+
+    return [
+        {
+            **card,
+            "native_language": target_language,
+        }
+        for card in cards
+    ]
+
+
 def encode_file_to_base64(file_bytes: bytes) -> str:
     return base64.b64encode(file_bytes).decode("utf-8")
 
