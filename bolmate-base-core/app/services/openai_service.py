@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import base64
+import hashlib
 import logging
+from functools import lru_cache
 from typing import Any, Dict, List
 
 from openai import OpenAI
@@ -9,6 +11,26 @@ from openai import OpenAI
 from config import get_settings
 
 logger = logging.getLogger(__name__)
+
+# In-memory cache for AI responses (consider Redis in production)
+_response_cache: Dict[str, Any] = {}
+
+
+def _cache_key(*args) -> str:
+    """Generate cache key from arguments."""
+    return hashlib.md5(str(args).encode()).hexdigest()
+
+
+def _get_cached_response(key: str) -> Any:
+    """Get cached response if available."""
+    return _response_cache.get(key)
+
+
+def _set_cached_response(key: str, value: Any) -> None:
+    """Cache response with size limit."""
+    if len(_response_cache) > 1000:  # Limit cache size
+        _response_cache.pop(next(iter(_response_cache)))
+    _response_cache[key] = value
 
 
 def _get_client() -> OpenAI | None:
@@ -25,26 +47,34 @@ def generate_hint_for_flashcard(
     native_language: str,
     source_language: str = "es",
 ) -> dict[str, str]:
+    # Check cache first
+    cache_key = _cache_key("hint", source_word, translated_word, native_language, source_language)
+    cached = _get_cached_response(cache_key)
+    if cached:
+        return cached
+
     client = _get_client()
     if not client:
         return {}
 
     settings = get_settings()
     prompt = (
-        "You are a concise language tutor. "
-        f"The learner's native language is {native_language}. "
-        f"Provide a one-sentence hint and one short example sentence in {source_language} for the word '{source_word}' "
-        f"meaning '{translated_word}'. Respond as JSON with keys hint, example_sentence, example_translation."
+        f"Language tutor. Native: {native_language}. "
+        f"For '{source_word}' ({translated_word}): short hint + example in {source_language}. "
+        f"JSON: hint, example_sentence, example_translation."
     )
     try:
         response = client.chat.completions.create(
             model=settings.openai_model,
-            temperature=settings.openai_temperature,
+            temperature=0.7,
+            max_tokens=500,
             messages=[{"role": "user", "content": prompt}],
             response_format={"type": "json_object"},
         )
         message = response.choices[0].message.content
-        return message and _safe_parse_json(message) or {}
+        result = message and _safe_parse_json(message) or {}
+        _set_cached_response(cache_key, result)
+        return result
     except Exception as exc:  # pragma: no cover - external dependency
         logger.exception("Failed to generate hint: %s", exc)
         return {}
@@ -56,20 +86,30 @@ def enrich_flashcards(
     client = _get_client()
     if not client:
         return words
+
+    # Limit batch size to 50 cards
+    MAX_BATCH = 50
+    if len(words) > MAX_BATCH:
+        logger.info(f"Processing {len(words)} cards in batches of {MAX_BATCH}")
+        batch1 = enrich_flashcards(words[:MAX_BATCH], native_language)
+        batch2 = enrich_flashcards(words[MAX_BATCH:], native_language)
+        return batch1 + batch2
+
     settings = get_settings()
     prompt = (
-        "You are enriching flashcards. For each item provide an example_sentence, example_translation, "
-        "and difficulty_level (A1/A2/B1). Return JSON array in same order with the new fields merged."
+        "Enrich flashcards: add example_sentence, example_translation, difficulty_level (A1/A2/B1). "
+        "JSON array same order with new fields."
     )
     try:
         response = client.chat.completions.create(
             model=settings.openai_model,
-            temperature=settings.openai_temperature,
+            temperature=0.5,
+            max_tokens=1500,
             messages=[
                 {"role": "system", "content": prompt},
                 {
                     "role": "user",
-                    "content": f"Native language: {native_language}. Items: {words}",
+                    "content": f"Native: {native_language}. Items: {words}",
                 },
             ],
             response_format={"type": "json_object"},
@@ -85,23 +125,29 @@ def enrich_flashcards(
 def generate_quiz_questions(
     cards: List[Dict[str, Any]], num_questions: int
 ) -> List[Dict[str, Any]]:
+    # Use free fallback for ≤5 questions
+    if num_questions <= 5:
+        return _fallback_quiz(cards, num_questions)
+
     client = _get_client()
     if not client or not cards:
         return _fallback_quiz(cards, num_questions)
+
     settings = get_settings()
     prompt = (
-        "Create diverse quiz questions (translation, multiple_choice, fill_in). "
-        "Return JSON with an array 'questions' where each item has question, type, answer and optional options."
+        "Create diverse quiz (translation, multiple_choice, fill_in). "
+        "JSON with 'questions' array: question, type, answer, optional options."
     )
     try:
         response = client.chat.completions.create(
             model=settings.openai_model,
-            temperature=settings.openai_temperature,
+            temperature=0.5,
+            max_tokens=1500,
             messages=[
                 {"role": "system", "content": prompt},
                 {
                     "role": "user",
-                    "content": f"Use these flashcards: {cards[:num_questions]}",
+                    "content": f"Flashcards: {cards[:num_questions]}",
                 },
             ],
             response_format={"type": "json_object"},
@@ -116,23 +162,28 @@ def generate_quiz_questions(
 
 
 def interpret_text_with_ai(text: str, native_language: str) -> List[Dict[str, Any]]:
+    # Check cache first
+    cache_key = _cache_key("interpret", text, native_language)
+    cached = _get_cached_response(cache_key)
+    if cached:
+        return cached
+
     client = _get_client()
     if not client:
         return []
+
     settings = get_settings()
     prompt = (
-        "Extract distinct vocabulary items from the provided text. "
-        "If the text contains existing translation pairs (e.g., 'si - yes', 'yo - ich'), preserve and use them. "
-        "Merge duplicate words and their variants. Detect source language for each word and translate "
-        f"into {native_language}. "
-        f"IMPORTANT: source_language MUST BE DIFFERENT from native_language ({native_language}). "
-        f"Only extract words that are NOT in {native_language}. "
-        "Respond as JSON with array 'items' of objects: source_word, source_language, translated_word, native_language."
+        "Extract vocabulary from text. Preserve translation pairs (e.g. 'si - yes'). "
+        f"Merge duplicates. Translate to {native_language}. "
+        f"IMPORTANT: source_language ≠ {native_language}. Only extract words NOT in {native_language}. "
+        "JSON array 'items': source_word, source_language, translated_word, native_language."
     )
     try:
         response = client.chat.completions.create(
             model=settings.openai_model,
-            temperature=settings.openai_temperature,
+            temperature=0.3,
+            max_tokens=2000,
             messages=[
                 {"role": "system", "content": prompt},
                 {"role": "user", "content": text},
@@ -161,6 +212,7 @@ def interpret_text_with_ai(text: str, native_language: str) -> List[Dict[str, An
 
             filtered_items.append(item)
 
+        _set_cached_response(cache_key, filtered_items)
         return filtered_items
     except Exception as exc:  # pragma: no cover
         logger.exception("Interpretation failed: %s", exc)
@@ -244,6 +296,13 @@ def _interpret_image_with_vision(
     image_content: bytes, mime_type: str, native_language: str
 ) -> List[Dict[str, Any]]:
     """Use OpenAI Vision API for OCR + interpretation."""
+    # Cache by image hash
+    image_hash = hashlib.md5(image_content).hexdigest()
+    cache_key = _cache_key("vision", image_hash, native_language)
+    cached = _get_cached_response(cache_key)
+    if cached:
+        return cached
+
     client = _get_client()
     if not client:
         return []
@@ -252,18 +311,16 @@ def _interpret_image_with_vision(
     base64_image = encode_file_to_base64(image_content)
 
     prompt = (
-        "Extract all vocabulary words from this image. "
-        "If the image contains existing translation pairs (e.g., 'si - yes', 'yo - ich'), preserve and use them. "
-        "Merge duplicate words and their variants. Detect source language for each word and translate "
-        f"into {native_language}. "
-        f"IMPORTANT: source_language MUST BE DIFFERENT from native_language ({native_language}). "
-        f"Only extract words that are NOT in {native_language}. "
-        "Respond as JSON with array 'items' of objects: source_word, source_language, translated_word, native_language."
+        "Extract vocabulary from image. Preserve translation pairs (e.g. 'si - yes'). "
+        f"Merge duplicates. Translate to {native_language}. "
+        f"IMPORTANT: source_language ≠ {native_language}. Only extract words NOT in {native_language}. "
+        "JSON array 'items': source_word, source_language, translated_word, native_language."
     )
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4o",  # Vision model
+            model="gpt-4o-mini",  # 80% cheaper than gpt-4o
+            max_tokens=2000,
             messages=[
                 {
                     "role": "user",
@@ -302,6 +359,7 @@ def _interpret_image_with_vision(
 
             filtered_items.append(item)
 
+        _set_cached_response(cache_key, filtered_items)
         return filtered_items
     except Exception as exc:
         logger.exception(f"Vision API interpretation failed: {exc}")
@@ -324,24 +382,31 @@ def translate_flashcards(
             for card in cards
         ]
 
+    # Limit batch size to 50 cards
+    MAX_BATCH = 50
+    if len(cards) > MAX_BATCH:
+        logger.info(f"Translating {len(cards)} cards in batches of {MAX_BATCH}")
+        batch1 = translate_flashcards(cards[:MAX_BATCH], target_language)
+        batch2 = translate_flashcards(cards[MAX_BATCH:], target_language)
+        return batch1 + batch2
+
     settings = get_settings()
     system_prompt = (
-        "You are a multilingual flashcard translator. Preserve each flashcard's id and structure. "
-        "Translate all learner-facing text fields (e.g., translated_word, example_sentence, "
-        "example_sentence_translated, notes, hints, explanations) into the target language while "
-        "keeping source_word and source_language unchanged. Return JSON object with 'flashcards' "
-        "array in the same order."
+        "Multilingual flashcard translator. Preserve id/structure. "
+        "Translate learner-facing fields (translated_word, example_sentence, notes, hints) to target language. "
+        "Keep source_word, source_language unchanged. JSON 'flashcards' array same order."
     )
 
     try:
         response = client.chat.completions.create(
             model=settings.openai_model,
-            temperature=settings.openai_temperature,
+            temperature=0.3,
+            max_tokens=2000,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {
                     "role": "user",
-                    "content": f"Target language: {target_language}. Flashcards: {cards}",
+                    "content": f"Target: {target_language}. Cards: {cards}",
                 },
             ],
             response_format={"type": "json_object"},
