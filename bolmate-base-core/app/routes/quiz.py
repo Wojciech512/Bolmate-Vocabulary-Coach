@@ -84,13 +84,17 @@ def submit_quiz_answer():
         return jsonify({"error": "Invalid request data", "details": e.errors()}), 400
 
     answer = data.answer.strip().lower()
+    reverse = request.args.get("reverse", "false").lower() == "true"
     session = SessionLocal()
     try:
         card = session.query(Flashcard).get(data.flashcard_id)
         if not card:
             return jsonify({"error": "Flashcard not found"}), 404
 
-        correct_answer = (card.translated_word or "").strip().lower()
+        # W reverse mode sprawdzamy source_word, w normalnym translated_word
+        correct_answer = (
+            (card.source_word if reverse else card.translated_word) or ""
+        ).strip().lower()
         is_correct = answer == correct_answer
         if is_correct:
             card.correct_count += 1
@@ -105,7 +109,7 @@ def submit_quiz_answer():
         )
         response = {
             "correct": is_correct,
-            "correctAnswer": card.translated_word,
+            "correctAnswer": card.source_word if reverse else card.translated_word,
             "stats": {
                 "correct_count": card.correct_count,
                 "incorrect_count": card.incorrect_count,

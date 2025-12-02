@@ -65,7 +65,7 @@ export default function QuizPanel() {
       const res = await submitQuizAnswer({
         flashcard_id: question.flashcard_id,
         answer,
-      });
+      }, reverseMode);
       setFeedback(
         res.data.correct
           ? "Correct!"

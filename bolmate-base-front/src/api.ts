@@ -186,8 +186,10 @@ export const getQuizQuestion = (reverseMode: boolean, targetLanguage?: string) =
     params: { reverse: reverseMode, target_language: targetLanguage },
   });
 
-export const submitQuizAnswer = (payload: SubmitQuizAnswerPayload) =>
-  api.post<QuizAnswerResponse>("/api/quiz", payload);
+export const submitQuizAnswer = (payload: SubmitQuizAnswerPayload, reverseMode: boolean) =>
+  api.post<QuizAnswerResponse>("/api/quiz", payload, {
+    params: { reverse: reverseMode },
+  });
 
 export const generateQuiz = (payload: GenerateQuizPayload) =>
   api.post<GenerateQuizResponse>("/api/quiz/generate", payload);
