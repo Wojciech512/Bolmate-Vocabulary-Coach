@@ -1,16 +1,39 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
+import { CssBaseline, ThemeProvider, createTheme, responsiveFontSizes } from "@mui/material";
 import App from "./App";
-import "./styles/global.css";
 import { LanguageProvider } from "./context/LanguageContext";
+
+let theme = createTheme({
+  palette: {
+    mode: "light",
+    primary: {
+      main: "#2563eb",
+    },
+    secondary: {
+      main: "#7c3aed",
+    },
+    background: {
+      default: "#f7f7f9",
+    },
+  },
+  typography: {
+    fontFamily: "'Inter', 'Roboto', 'Helvetica', 'Arial', sans-serif",
+  },
+});
+
+theme = responsiveFontSizes(theme);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <LanguageProvider>
-        <App />
-      </LanguageProvider>
-    </BrowserRouter>
-  </React.StrictMode>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <BrowserRouter>
+        <LanguageProvider>
+          <App />
+        </LanguageProvider>
+      </BrowserRouter>
+    </ThemeProvider>
+  </React.StrictMode>,
 );

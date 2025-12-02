@@ -1,3 +1,4 @@
+import { Alert, Box, Button, Card, CardContent, Stack, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { getQuizQuestion, submitQuizAnswer } from "../api";
 
@@ -50,39 +51,67 @@ export default function QuizPanel() {
   };
 
   return (
-    <div className="card">
-      <h3>Quiz</h3>
-      {!question && <p className="muted">Loading question...</p>}
-      {question && (
-        <form onSubmit={handleSubmit} className="quiz-form">
-          <div className="question">
-            <div className="muted">Translate this word</div>
-            <div className="big">{question.source_word}</div>
-          </div>
-          <input
-            placeholder="Your translation"
-            value={answer}
-            onChange={(e) => setAnswer(e.target.value)}
-          />
-          <div className="actions">
-            <button type="submit" disabled={loading}>{loading ? "Checking..." : "Check"}</button>
-            <button type="button" className="secondary" onClick={loadQuestion}>Next word</button>
-          </div>
-        </form>
-      )}
-      {feedback && <p className="feedback">{feedback}</p>}
-      {hint && (hint.hint || hint.example_sentence) && (
-        <div className="hint-box">
-          {hint.hint && <p><strong>Hint:</strong> {hint.hint}</p>}
-          {hint.example_sentence && (
-            <p>
-              <strong>Example:</strong> {hint.example_sentence}
-              {hint.example_translation && <span className="muted"> — {hint.example_translation}</span>}
-            </p>
-          )}
-        </div>
-      )}
-    </div>
+    <Card variant="outlined">
+      <CardContent>
+        <Typography variant="h6" gutterBottom>
+          Quiz
+        </Typography>
+        {!question && (
+          <Typography variant="body2" color="text.secondary">
+            Loading question...
+          </Typography>
+        )}
+        {question && (
+          <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <Box>
+              <Typography variant="caption" color="text.secondary">
+                Translate this word
+              </Typography>
+              <Typography variant="h4" fontWeight={700} mt={0.5}>
+                {question.source_word}
+              </Typography>
+            </Box>
+            <TextField
+              placeholder="Your translation"
+              value={answer}
+              onChange={(e) => setAnswer(e.target.value)}
+              label="Answer"
+              fullWidth
+            />
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
+              <Button type="submit" variant="contained" disabled={loading} sx={{ minWidth: 140 }}>
+                {loading ? "Checking..." : "Check"}
+              </Button>
+              <Button variant="outlined" color="secondary" onClick={loadQuestion} sx={{ minWidth: 140 }}>
+                Next word
+              </Button>
+            </Stack>
+          </Box>
+        )}
+
+        {feedback && (
+          <Alert severity={feedback.startsWith("Correct") ? "success" : "warning"} sx={{ mt: 2 }}>
+            {feedback}
+          </Alert>
+        )}
+
+        {hint && (hint.hint || hint.example_sentence) && (
+          <Box sx={{ mt: 2, p: 2, bgcolor: "primary.50", borderRadius: 2 }}>
+            {hint.hint && (
+              <Typography gutterBottom>
+                <strong>Hint:</strong> {hint.hint}
+              </Typography>
+            )}
+            {hint.example_sentence && (
+              <Typography variant="body2" color="text.secondary">
+                <strong>Example:</strong> {hint.example_sentence}
+                {hint.example_translation && ` — ${hint.example_translation}`}
+              </Typography>
+            )}
+          </Box>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 

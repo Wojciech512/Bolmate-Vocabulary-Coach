@@ -1,32 +1,70 @@
-import { Link } from "react-router-dom";
-import "../styles/home.css";
+import { Card, CardActions, CardContent, Grid, Button, Typography, Box } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
 
 function HomePage() {
   return (
-    <section className="home">
-      <h2>Bolmate Vocabulary Coach</h2>
-      <p>
+    <Box>
+      <Typography variant="h4" gutterBottom>
+        Bolmate Vocabulary Coach
+      </Typography>
+      <Typography variant="body1" color="text.secondary" gutterBottom>
         Add Spanish (or any language) words from your notebook, practice them daily in a fast Q&A flow,
         and get AI-powered hints, examples, and OCR/interpretation support.
-      </p>
-      <div className="home-grid">
-        <div className="card">
-          <h3>Add words</h3>
-          <p>Type your Spanish word and translation. Progress counters stay visible.</p>
-          <Link to="/flashcards" className="button">Go to Flashcards</Link>
-        </div>
-        <div className="card">
-          <h3>Practice</h3>
-          <p>One-word quiz loop with instant correctness check and AI hints when you miss.</p>
-          <Link to="/quiz" className="button">Start Quiz</Link>
-        </div>
-        <div className="card">
-          <h3>Interpret</h3>
-          <p>Paste notebook text or upload files to extract vocabulary with translations.</p>
-          <Link to="/interpret" className="button">Try Interpret</Link>
-        </div>
-      </div>
-    </section>
+      </Typography>
+      <Grid container spacing={2} sx={{ mt: 1 }}>
+        <Grid item xs={12} md={4}>
+          <Card variant="outlined" sx={{ height: "100%" }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Add words
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Type your Spanish word and translation. Progress counters stay visible.
+              </Typography>
+            </CardContent>
+            <CardActions sx={{ px: 2, pb: 2 }}>
+              <Button component={RouterLink} to="/flashcards" variant="contained" fullWidth>
+                Go to Flashcards
+              </Button>
+            </CardActions>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Card variant="outlined" sx={{ height: "100%" }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Practice
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                One-word quiz loop with instant correctness check and AI hints when you miss.
+              </Typography>
+            </CardContent>
+            <CardActions sx={{ px: 2, pb: 2 }}>
+              <Button component={RouterLink} to="/quiz" variant="contained" fullWidth>
+                Start Quiz
+              </Button>
+            </CardActions>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Card variant="outlined" sx={{ height: "100%" }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Interpret
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Paste notebook text or upload files to extract vocabulary with translations.
+              </Typography>
+            </CardContent>
+            <CardActions sx={{ px: 2, pb: 2 }}>
+              <Button component={RouterLink} to="/interpret" variant="contained" fullWidth>
+                Try Interpret
+              </Button>
+            </CardActions>
+          </Card>
+        </Grid>
+      </Grid>
+    </Box>
   );
 }
 

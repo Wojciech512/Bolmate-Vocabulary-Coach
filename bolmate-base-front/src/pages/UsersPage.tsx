@@ -1,6 +1,21 @@
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Divider,
+  Grid,
+  List,
+  ListItem,
+  ListItemText,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { FormEvent, useEffect, useState } from "react";
 import api from "../api";
-import "../styles/users.css";
 
 type User = {
   id: number;
@@ -56,59 +71,100 @@ function UsersPage() {
   };
 
   return (
-    <section className="users">
-      <header>
-        <h2>Users</h2>
-        <p>Read and create users stored in PostgreSQL via the Flask API.</p>
-      </header>
+    <Box>
+      <Box mb={3}>
+        <Typography variant="h5" gutterBottom>
+          Users
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Read and create users stored in PostgreSQL via the Flask API.
+        </Typography>
+      </Box>
 
-      <div className="users-grid">
-        <form className="card" onSubmit={handleSubmit}>
-          <label>
-            Name
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Jane Doe"
-            />
-          </label>
-          <label>
-            Email
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="jane@example.com"
-            />
-          </label>
-          <button type="submit" disabled={loading}>
-            {loading ? "Submitting..." : "Create user"}
-          </button>
-          {error && <p className="error">{error}</p>}
-        </form>
+      <Grid container spacing={2} alignItems="flex-start">
+        <Grid item xs={12} md={4}>
+          <Card component="form" onSubmit={handleSubmit} variant="outlined">
+            <CardHeader title="Create user" subheader="Provide name and email" />
+            <CardContent>
+              <Stack spacing={2}>
+                <TextField
+                  label="Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Jane Doe"
+                  required
+                />
+                <TextField
+                  label="Email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="jane@example.com"
+                  required
+                />
+                {error && (
+                  <Alert severity="error" variant="outlined">
+                    {error}
+                  </Alert>
+                )}
+                <Button type="submit" variant="contained" disabled={loading} fullWidth>
+                  {loading ? "Submitting..." : "Create user"}
+                </Button>
+              </Stack>
+            </CardContent>
+          </Card>
+        </Grid>
 
-        <div className="card">
-          <div className="users-list-header">
-            <h3>Existing users</h3>
-            <button type="button" onClick={fetchUsers} disabled={loading}>
-              Refresh
-            </button>
-          </div>
-          {loading && <p>Loading...</p>}
-          {!loading && users.length === 0 && <p>No users found yet.</p>}
-          <ul className="users-list">
-            {users.map((user) => (
-              <li key={user.id}>
-                <div className="user-name">{user.name}</div>
-                <div className="user-email">{user.email}</div>
-                {user.created_at && <small>{new Date(user.created_at).toLocaleString()}</small>}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </section>
+        <Grid item xs={12} md={8}>
+          <Card variant="outlined">
+            <CardHeader
+              title="Existing users"
+              action={
+                <Button onClick={fetchUsers} disabled={loading} variant="outlined">
+                  Refresh
+                </Button>
+              }
+            />
+            <Divider />
+            <CardContent>
+              {loading && (
+                <Typography variant="body2" color="text.secondary">
+                  Loading...
+                </Typography>
+              )}
+              {!loading && users.length === 0 && (
+                <Typography variant="body2" color="text.secondary">
+                  No users found yet.
+                </Typography>
+              )}
+              {!loading && users.length > 0 && (
+                <List>
+                  {users.map((user) => (
+                    <ListItem key={user.id} divider>
+                      <ListItemText
+                        primary={user.name}
+                        secondary={
+                          <>
+                            <Typography component="span" variant="body2" color="text.secondary">
+                              {user.email}
+                            </Typography>
+                            {user.created_at && (
+                              <Typography component="span" variant="caption" color="text.secondary" display="block">
+                                {new Date(user.created_at).toLocaleString()}
+                              </Typography>
+                            )}
+                          </>
+                        }
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    </Box>
   );
 }
 

@@ -1,3 +1,19 @@
+import AddIcon from "@mui/icons-material/Add";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Divider,
+  List,
+  ListItem,
+  ListItemText,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useState } from "react";
 import { interpretText, createFlashcard } from "../api";
 import { useLanguage } from "../context/LanguageContext";
@@ -27,20 +43,20 @@ export default function InterpretForm() {
   };
 
   const handleAddFlashcard = async (item: any, index: number) => {
-    setAddingIds(prev => new Set(prev).add(index));
+    setAddingIds((prev) => new Set(prev).add(index));
     setError(null);
     try {
       await createFlashcard({
         source_word: item.source_word,
         translated_word: item.translated_word,
         native_language: item.native_language || nativeLanguage,
-        source_language: item.source_language || "es"
+        source_language: item.source_language || "es",
       });
-      setAddedIds(prev => new Set(prev).add(index));
+      setAddedIds((prev) => new Set(prev).add(index));
     } catch (err: any) {
       setError(err?.response?.data?.error || "Failed to add flashcard");
     } finally {
-      setAddingIds(prev => {
+      setAddingIds((prev) => {
         const newSet = new Set(prev);
         newSet.delete(index);
         return newSet;
@@ -58,9 +74,9 @@ export default function InterpretForm() {
             source_word: results[i].source_word,
             translated_word: results[i].translated_word,
             native_language: results[i].native_language || nativeLanguage,
-            source_language: results[i].source_language || "es"
+            source_language: results[i].source_language || "es",
           });
-          setAddedIds(prev => new Set(prev).add(i));
+          setAddedIds((prev) => new Set(prev).add(i));
         }
       }
     } catch (err: any) {
@@ -71,50 +87,93 @@ export default function InterpretForm() {
   };
 
   return (
-    <div className="card">
-      <h3>Interpret notebook text</h3>
-      <p className="muted">Paste text or sentences from your notebook. We'll extract unique words and translate them.</p>
-      <textarea
-        rows={5}
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder="Paste text here..."
-      />
-      <button onClick={handleInterpret} disabled={loading || !input}>
-        {loading ? "Processing..." : "Interpret"}
-      </button>
-      {error && <p className="error">{error}</p>}
-      {results.length > 0 && (
-        <div className="results">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h4>Suggested flashcards ({results.length})</h4>
-            <button
-              onClick={handleAddAll}
-              disabled={addingAll || addedIds.size === results.length}
-              style={{ fontSize: "0.9em", padding: "0.4em 0.8em" }}
+    <Card variant="outlined">
+      <CardContent>
+        <Stack spacing={2}>
+          <Box>
+            <Typography variant="h6">Interpret notebook text</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Paste text or sentences from your notebook. We'll extract unique words and translate them.
+            </Typography>
+          </Box>
+
+          <TextField
+            multiline
+            minRows={5}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Paste text here..."
+            label="Notebook text"
+            fullWidth
+          />
+
+          <Stack direction="row" spacing={1} justifyContent="flex-start">
+            <Button
+              variant="contained"
+              startIcon={<CloudUploadIcon />}
+              onClick={handleInterpret}
+              disabled={loading || !input}
             >
-              {addingAll ? "Adding..." : `Add all (${results.length - addedIds.size})`}
-            </button>
-          </div>
-          <ul>
-            {results.map((item, idx) => (
-              <li key={`${item.source_word}-${idx}`} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5em" }}>
-                <span>
-                  <strong>{item.source_word}</strong> → {item.translated_word} ({item.native_language})
-                </span>
-                <button
-                  onClick={() => handleAddFlashcard(item, idx)}
-                  disabled={addingIds.has(idx) || addedIds.has(idx)}
-                  style={{ fontSize: "0.8em", padding: "0.3em 0.6em", marginLeft: "1em" }}
-                >
-                  {addingIds.has(idx) ? "..." : addedIds.has(idx) ? "✓ Added" : "Add"}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
+              {loading ? "Processing..." : "Interpret"}
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<AddIcon />}
+              onClick={handleAddAll}
+              disabled={addingAll || results.length === 0 || addedIds.size === results.length}
+            >
+              {addingAll ? "Adding..." : `Add all (${Math.max(results.length - addedIds.size, 0)})`}
+            </Button>
+          </Stack>
+
+          {error && (
+            <Alert severity="error" variant="outlined">
+              {error}
+            </Alert>
+          )}
+
+          {results.length > 0 && (
+            <Box>
+              <Divider sx={{ my: 1 }} />
+              <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                Suggested flashcards ({results.length})
+              </Typography>
+              <List dense>
+                {results.map((item, idx) => (
+                  <ListItem
+                    key={`${item.source_word}-${idx}`}
+                    divider
+                    secondaryAction={
+                      <Button
+                        size="small"
+                        variant={addedIds.has(idx) ? "outlined" : "contained"}
+                        color={addedIds.has(idx) ? "success" : "primary"}
+                        onClick={() => handleAddFlashcard(item, idx)}
+                        disabled={addingIds.has(idx) || addedIds.has(idx)}
+                      >
+                        {addingIds.has(idx) ? "Adding..." : addedIds.has(idx) ? "Added" : "Add"}
+                      </Button>
+                    }
+                  >
+                    <ListItemText
+                      primary={`${item.source_word} → ${item.translated_word} (${item.native_language || nativeLanguage})`}
+                      secondary={
+                        item.example_sentence
+                          ? `${item.example_sentence}${
+                              item.example_sentence_translated
+                                ? ` — ${item.example_sentence_translated}`
+                                : ""
+                            }`
+                          : undefined
+                      }
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </Box>
+          )}
+        </Stack>
+      </CardContent>
+    </Card>
   );
 }
-
