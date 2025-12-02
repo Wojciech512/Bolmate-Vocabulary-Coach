@@ -13,6 +13,21 @@
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 24px;
+  background: #0f172a;
+  color: #fff;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+}
+
+.app-header .brand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.app-header .tagline {
+  font-size: 0.9rem;
+  color: #cbd5f5;
 }
 
 .app-header nav {
@@ -25,6 +40,7 @@
   border-radius: 8px;
   border: 1px solid transparent;
   transition: border-color 0.2s ease, background-color 0.2s ease;
+  color: #e2e8f0;
 }
 
 .app-header a.active {
@@ -35,6 +51,10 @@
 
 .app-header a:hover:not(.active) {
   border-color: #d1d5db;
+}
+
+.language-picker select {
+  margin-left: 0.35rem;
 }
 
 .app-content {

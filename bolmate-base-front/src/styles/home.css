@@ -7,10 +7,16 @@
   max-width: 720px;
 }
 
-.home ul {
-  padding-left: 20px;
+.home ul,
+.home ol {
+  padding-left: 24px;
+  margin-top: 12px;
 }
 
 .home li {
   margin-bottom: 6px;
+}
+
+.home .note {
+  color: #374151;
 }

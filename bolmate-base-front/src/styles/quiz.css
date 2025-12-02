@@ -1,0 +1,38 @@
+.quiz header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.quiz .question {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.feedback {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.feedback.correct {
+  background: #ecfdf3;
+  color: #14532d;
+}
+
+.feedback.incorrect {
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.feedback .hint {
+  margin-top: 0.5rem;
+}
+
+.feedback button {
+  margin-top: 0.5rem;
+}
+

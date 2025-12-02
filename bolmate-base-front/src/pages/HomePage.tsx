@@ -3,17 +3,14 @@ import "../styles/home.css";
 function HomePage() {
   return (
     <section className="home">
-      <h2>Welcome</h2>
-      <p>
-        This template wires together a React frontend, a Flask backend, and a PostgreSQL
-        database. Use the navigation above to explore the example users module or extend the
-        layout with your own pages.
-      </p>
-      <ul>
-        <li>React Router for navigation</li>
-        <li>Axios-based API helper</li>
-        <li>Environment-driven API base URL</li>
-      </ul>
+      <h2>Spanish vocabulary coach</h2>
+      <p>Move from paper notebook → digital flashcards → daily quiz.</p>
+      <ol>
+        <li>Add new words on the Flashcards page (Spanish + your translation).</li>
+        <li>Use Quiz for rapid recall; stats update per word.</li>
+        <li>Try Interpret to upload notebook photos/PDFs or paste text and auto-build cards.</li>
+      </ol>
+      <p className="note">OpenAI is called from the backend only for hints, examples, and OCR.</p>
     </section>
   );
 }
