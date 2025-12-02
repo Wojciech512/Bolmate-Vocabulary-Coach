@@ -124,7 +124,10 @@ def interpret_text_with_ai(text: str, native_language: str) -> List[Dict[str, An
         "Extract distinct vocabulary items from the provided text. "
         "If the text contains existing translation pairs (e.g., 'si - yes', 'yo - ich'), preserve and use them. "
         "Merge duplicate words and their variants. Detect source language for each word and translate "
-        f"into {native_language}. Respond as JSON with array 'items' of objects: source_word, source_language, translated_word, native_language."
+        f"into {native_language}. "
+        f"IMPORTANT: source_language MUST BE DIFFERENT from native_language ({native_language}). "
+        f"Only extract words that are NOT in {native_language}. "
+        "Respond as JSON with array 'items' of objects: source_word, source_language, translated_word, native_language."
     )
     try:
         response = client.chat.completions.create(
@@ -138,7 +141,15 @@ def interpret_text_with_ai(text: str, native_language: str) -> List[Dict[str, An
         )
         message = response.choices[0].message.content
         parsed = _safe_parse_json(message)
-        return parsed.get("items", []) if isinstance(parsed, dict) else []
+        items = parsed.get("items", []) if isinstance(parsed, dict) else []
+
+        # Filter out items where source_language == native_language
+        filtered_items = [
+            item for item in items
+            if item.get("source_language", "").lower() != native_language.lower()
+        ]
+
+        return filtered_items
     except Exception as exc:  # pragma: no cover
         logger.exception("Interpretation failed: %s", exc)
         return []
@@ -232,7 +243,10 @@ def _interpret_image_with_vision(
         "Extract all vocabulary words from this image. "
         "If the image contains existing translation pairs (e.g., 'si - yes', 'yo - ich'), preserve and use them. "
         "Merge duplicate words and their variants. Detect source language for each word and translate "
-        f"into {native_language}. Respond as JSON with array 'items' of objects: source_word, source_language, translated_word, native_language."
+        f"into {native_language}. "
+        f"IMPORTANT: source_language MUST BE DIFFERENT from native_language ({native_language}). "
+        f"Only extract words that are NOT in {native_language}. "
+        "Respond as JSON with array 'items' of objects: source_word, source_language, translated_word, native_language."
     )
 
     try:
@@ -256,7 +270,15 @@ def _interpret_image_with_vision(
         )
         message = response.choices[0].message.content
         parsed = _safe_parse_json(message)
-        return parsed.get("items", []) if isinstance(parsed, dict) else []
+        items = parsed.get("items", []) if isinstance(parsed, dict) else []
+
+        # Filter out items where source_language == native_language
+        filtered_items = [
+            item for item in items
+            if item.get("source_language", "").lower() != native_language.lower()
+        ]
+
+        return filtered_items
     except Exception as exc:
         logger.exception(f"Vision API interpretation failed: {exc}")
         return []
