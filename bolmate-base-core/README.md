@@ -4,10 +4,13 @@ Lightweight Flask boilerplate with SQLAlchemy 1.4, Alembic migrations, and Postg
 
 ## Features
 - Flask application factory with modular blueprints
-- Healthcheck endpoint at `/health`
-- Example `users` module with GET/POST
+- Healthcheck endpoint at `/api/health`
+- Flashcards CRUD at `/api/flashcards`
+- Quiz endpoints at `/api/quiz` (check answers + AI hint) and `/api/quiz/generate` (AI-generated question sets)
+- Interpret endpoint at `/api/interpret` for OCR/text extraction via OpenAI
+- Languages metadata at `/api/languages`
 - SQLAlchemy 1.4 session management and declarative base
-- Alembic migrations ready to run
+- Alembic migrations ready to run (users, flashcards, quizzes, quiz_items)
 - Environment-driven configuration via `.env`
 
 ## Project layout

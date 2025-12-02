@@ -11,21 +11,24 @@ function Layout({ children }: LayoutProps) {
   return (
     <div className="app-shell">
       <header className="app-header">
-        <h1>Bolmate Base</h1>
+        <h1>Bolmate Coach</h1>
         <nav>
           <Link className={location.pathname === "/" ? "active" : ""} to="/">
-            Start
+            Home
           </Link>
-          <Link
-            className={location.pathname.startsWith("/users") ? "active" : ""}
-            to="/users"
-          >
-            Users
+          <Link className={location.pathname.startsWith("/flashcards") ? "active" : ""} to="/flashcards">
+            Flashcards
+          </Link>
+          <Link className={location.pathname.startsWith("/quiz") ? "active" : ""} to="/quiz">
+            Quiz
+          </Link>
+          <Link className={location.pathname.startsWith("/interpret") ? "active" : ""} to="/interpret">
+            Interpret
           </Link>
         </nav>
       </header>
       <main className="app-content">{children}</main>
-      <footer className="app-footer">React + Flask + PostgreSQL boilerplate</footer>
+      <footer className="app-footer">React + Flask + PostgreSQL vocabulary coach</footer>
     </div>
   );
 }

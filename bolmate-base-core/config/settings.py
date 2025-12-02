@@ -12,6 +12,10 @@ class Settings(BaseSettings):
     database_name: str = "bolmate_base"
     sqlalchemy_echo: bool = False
     allow_origin: str = "*"
+    openai_api_key: str | None = None
+    openai_model: str = "gpt-4o-mini"
+    openai_temperature: float = 0.2
+    default_native_language: str = "pl"
 
     model_config = SettingsConfigDict(env_file=(".env", ".env.local"), env_file_encoding="utf-8", case_sensitive=False)
 

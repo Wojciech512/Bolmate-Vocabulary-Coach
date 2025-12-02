@@ -36,3 +36,158 @@ input,
 button {
   font-size: 1rem;
 }
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 32px;
+  background: #111827;
+  color: white;
+}
+
+.app-header nav a {
+  margin-right: 16px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: #e5e7eb;
+}
+
+.app-header nav a.active {
+  background: #2563eb;
+  color: white;
+}
+
+.app-content {
+  flex: 1;
+  padding: 24px 32px;
+}
+
+.app-footer {
+  text-align: center;
+  padding: 12px;
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.page h2 {
+  margin: 0 0 8px 0;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+.form-row label {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+}
+
+button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+}
+
+button.secondary {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 8px;
+  text-align: left;
+}
+
+.muted {
+  color: #6b7280;
+}
+
+.small {
+  font-size: 0.9rem;
+}
+
+.pill {
+  display: inline-block;
+  background: #eef2ff;
+  color: #4338ca;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-top: 4px;
+}
+
+.quiz-form .question .big {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.feedback {
+  margin-top: 12px;
+  font-weight: 600;
+}
+
+.hint-box {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.button {
+  display: inline-block;
+  margin-top: 8px;
+  background: #2563eb;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.error {
+  color: #b91c1c;
+}
