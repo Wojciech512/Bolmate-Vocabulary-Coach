@@ -17,7 +17,12 @@ class Settings(BaseSettings):
     openai_temperature: float = 0.2
     default_native_language: str = "pl"
 
-    model_config = SettingsConfigDict(env_file=(".env", ".env.local"), env_file_encoding="utf-8", case_sensitive=False)
+    model_config = SettingsConfigDict(
+        env_file=(".env", ".env.local"),
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore"
+    )
 
     @property
     def database_url(self) -> str:
