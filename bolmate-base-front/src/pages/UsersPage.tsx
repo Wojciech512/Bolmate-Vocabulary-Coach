@@ -61,7 +61,7 @@ function UsersPage() {
       await api.post("/users", { name, email });
       setName("");
       setEmail("");
-      fetchUsers();
+      await fetchUsers();
     } catch (err: unknown) {
       console.error(err);
       setError("Could not create the user. Make sure the email is unique.");
