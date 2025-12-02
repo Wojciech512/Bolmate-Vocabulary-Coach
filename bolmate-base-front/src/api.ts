@@ -148,9 +148,7 @@ export type SwitchLanguageResponse = {
 export type DeleteResponse = {
   status: string;
 };
-// TODO jeżeli w podanym tekście znajdują się już tłumaczenia danego słowa, jeżeli tak to wykorzystaj je do fiszki i połącz te słowa, sprawdzanie duplikatów i agregowanie podobnych słów
-// TODO interpretowanie danych z plików tekstowych (.pdf, .docx itd.), zdjęciowych w Interpret (OCR & AI)
-
+// TODO healthchecks dla serwisów
 // TODO aktualizacja dokumentacji
 
 // TODO generowanie memów tak aby zapamiętywać słowa?
@@ -181,6 +179,20 @@ export const interpretText = (text: string, native_language: string) =>
     text,
     native_language,
   } as InterpretTextPayload);
+
+export const interpretFile = (files: File[], native_language: string) => {
+  const formData = new FormData();
+  files.forEach((file) => {
+    formData.append("files", file);
+  });
+  formData.append("native_language", native_language);
+
+  return api.post<InterpretResponse>("/api/interpret/file", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
 
 export const fetchLanguages = () => api.get<LanguagesResponse>("/api/languages");
 

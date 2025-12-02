@@ -121,7 +121,9 @@ def interpret_text_with_ai(text: str, native_language: str) -> List[Dict[str, An
         return []
     settings = get_settings()
     prompt = (
-        "Extract distinct vocabulary items from the provided text. Detect source language for each word and translate "
+        "Extract distinct vocabulary items from the provided text. "
+        "If the text contains existing translation pairs (e.g., 'si - yes', 'yo - ich'), preserve and use them. "
+        "Merge duplicate words and their variants. Detect source language for each word and translate "
         f"into {native_language}. Respond as JSON with array 'items' of objects: source_word, source_language, translated_word, native_language."
     )
     try:
@@ -139,6 +141,124 @@ def interpret_text_with_ai(text: str, native_language: str) -> List[Dict[str, An
         return parsed.get("items", []) if isinstance(parsed, dict) else []
     except Exception as exc:  # pragma: no cover
         logger.exception("Interpretation failed: %s", exc)
+        return []
+
+
+def interpret_file_with_ai(
+    file_content: bytes, filename: str, mime_type: str | None, native_language: str
+) -> List[Dict[str, Any]]:
+    """Interpret files with OCR + AI. Supports PDF, DOCX, TXT, images (PNG, JPG)."""
+    client = _get_client()
+    if not client:
+        return []
+
+    settings = get_settings()
+    text_content = ""
+
+    # Extract text based on file type
+    if mime_type and mime_type.startswith("text"):
+        text_content = file_content.decode("utf-8", errors="ignore")
+    elif mime_type == "application/pdf":
+        text_content = _extract_text_from_pdf(file_content)
+    elif (
+        mime_type
+        == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ):
+        text_content = _extract_text_from_docx(file_content)
+    elif mime_type and mime_type.startswith("image/"):
+        # Use OpenAI Vision API for OCR
+        return _interpret_image_with_vision(file_content, mime_type, native_language)
+    else:
+        logger.warning(f"Unsupported file type: {mime_type}")
+        return []
+
+    if not text_content.strip():
+        return []
+
+    # Use standard text interpretation
+    return interpret_text_with_ai(text_content, native_language)
+
+
+def _extract_text_from_pdf(content: bytes) -> str:
+    """Extract text from PDF file."""
+    try:
+        import io
+
+        import PyPDF2
+
+        pdf_reader = PyPDF2.PdfReader(io.BytesIO(content))
+        text = ""
+        for page in pdf_reader.pages:
+            text += page.extract_text() + "\n"
+        return text
+    except ImportError:
+        logger.warning("PyPDF2 not installed, cannot process PDF")
+        return ""
+    except Exception as exc:
+        logger.exception(f"Failed to extract text from PDF: {exc}")
+        return ""
+
+
+def _extract_text_from_docx(content: bytes) -> str:
+    """Extract text from DOCX file."""
+    try:
+        import io
+
+        import docx
+
+        doc = docx.Document(io.BytesIO(content))
+        text = "\n".join([paragraph.text for paragraph in doc.paragraphs])
+        return text
+    except ImportError:
+        logger.warning("python-docx not installed, cannot process DOCX")
+        return ""
+    except Exception as exc:
+        logger.exception(f"Failed to extract text from DOCX: {exc}")
+        return ""
+
+
+def _interpret_image_with_vision(
+    image_content: bytes, mime_type: str, native_language: str
+) -> List[Dict[str, Any]]:
+    """Use OpenAI Vision API for OCR + interpretation."""
+    client = _get_client()
+    if not client:
+        return []
+
+    settings = get_settings()
+    base64_image = encode_file_to_base64(image_content)
+
+    prompt = (
+        "Extract all vocabulary words from this image. "
+        "If the image contains existing translation pairs (e.g., 'si - yes', 'yo - ich'), preserve and use them. "
+        "Merge duplicate words and their variants. Detect source language for each word and translate "
+        f"into {native_language}. Respond as JSON with array 'items' of objects: source_word, source_language, translated_word, native_language."
+    )
+
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o",  # Vision model
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": prompt},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:{mime_type};base64,{base64_image}"
+                            },
+                        },
+                    ],
+                }
+            ],
+            response_format={"type": "json_object"},
+        )
+        message = response.choices[0].message.content
+        parsed = _safe_parse_json(message)
+        return parsed.get("items", []) if isinstance(parsed, dict) else []
+    except Exception as exc:
+        logger.exception(f"Vision API interpretation failed: {exc}")
         return []
 
 

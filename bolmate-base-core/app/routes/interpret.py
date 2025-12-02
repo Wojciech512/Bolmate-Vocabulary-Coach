@@ -1,11 +1,18 @@
+import logging
 import mimetypes
 
 from flask import Blueprint, jsonify, request
 from pydantic import ValidationError
 
 from app.schemas.interpret import InterpretRequest
-from app.services.openai_service import encode_file_to_base64, interpret_text_with_ai
+from app.services.openai_service import (
+    encode_file_to_base64,
+    interpret_file_with_ai,
+    interpret_text_with_ai,
+)
 from config import get_settings
+
+logger = logging.getLogger(__name__)
 
 interpret_bp = Blueprint("interpret", __name__)
 
@@ -57,3 +64,67 @@ def interpret_payload():
             results.extend(placeholder)
 
     return jsonify({"items": results})
+
+
+@interpret_bp.post("/interpret/file")
+def interpret_file():
+    """Handle file uploads with OCR + AI interpretation.
+
+    Supports: PDF, DOCX, TXT, PNG, JPG
+    - Detects existing translation pairs (e.g., "si - yes", "yo - ich")
+    - Merges duplicates and aggregates word forms
+    - Uses OCR for images
+    """
+    native_language = request.form.get("native_language")
+    if not native_language:
+        native_language = get_settings().default_native_language
+
+    files = request.files.getlist("files")
+    if not files:
+        return jsonify({"error": "No files provided"}), 400
+
+    all_items = []
+    for file in files:
+        try:
+            content = file.read()
+            filename = file.filename or "unknown"
+            mime_type, _ = mimetypes.guess_type(filename)
+
+            logger.info(f"Processing file: {filename} ({mime_type})")
+
+            items = interpret_file_with_ai(
+                content, filename, mime_type, native_language
+            )
+            all_items.extend(items)
+        except Exception as e:
+            logger.exception(f"Error processing file {file.filename}: {e}")
+            continue
+
+    # Deduplicate and merge items
+    merged_items = _merge_and_deduplicate_items(all_items)
+
+    return jsonify({"items": merged_items})
+
+
+def _merge_and_deduplicate_items(items):
+    """Merge duplicate words and aggregate similar forms."""
+    seen = {}
+    for item in items:
+        source_word = item.get("source_word", "").lower().strip()
+        if not source_word:
+            continue
+
+        if source_word in seen:
+            # Merge: prefer non-empty values
+            existing = seen[source_word]
+            for key in [
+                "translated_word",
+                "example_sentence",
+                "example_sentence_translated",
+            ]:
+                if item.get(key) and not existing.get(key):
+                    existing[key] = item[key]
+        else:
+            seen[source_word] = item
+
+    return list(seen.values())
