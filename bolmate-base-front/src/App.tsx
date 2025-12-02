@@ -1,14 +1,18 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./components/Layout";
+import FlashcardsPage from "./pages/FlashcardsPage";
 import HomePage from "./pages/HomePage";
-import UsersPage from "./pages/UsersPage";
+import InterpretPage from "./pages/InterpretPage";
+import QuizPage from "./pages/QuizPage";
 
 function App() {
   return (
     <Layout>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/users" element={<UsersPage />} />
+        <Route path="/flashcards" element={<FlashcardsPage />} />
+        <Route path="/quiz" element={<QuizPage />} />
+        <Route path="/interpret" element={<InterpretPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>

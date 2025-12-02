@@ -1,19 +1,33 @@
+import { Link } from "react-router-dom";
 import "../styles/home.css";
 
 function HomePage() {
   return (
     <section className="home">
-      <h2>Welcome</h2>
+      <h2>Spanish notebook → flashcards → quiz</h2>
       <p>
-        This template wires together a React frontend, a Flask backend, and a PostgreSQL
-        database. Use the navigation above to explore the example users module or extend the
-        layout with your own pages.
+        Add the words from your notebook, practice one-by-one, and import new ones with AI/OCR
+        when you are ready. Keep the flow lightweight: type, submit, practice.
       </p>
-      <ul>
-        <li>React Router for navigation</li>
-        <li>Axios-based API helper</li>
-        <li>Environment-driven API base URL</li>
-      </ul>
+      <div className="home-actions">
+        <Link to="/flashcards" className="button primary">Add flashcards</Link>
+        <Link to="/quiz" className="button secondary">Start quiz</Link>
+        <Link to="/interpret" className="button">Import from photo/text</Link>
+      </div>
+      <div className="home-grid">
+        <article>
+          <h3>1. Add</h3>
+          <p>Enter Spanish + translation, or upload text/images to let AI extract them.</p>
+        </article>
+        <article>
+          <h3>2. Practice</h3>
+          <p>One card at a time. Instant correctness feedback with optional AI hint.</p>
+        </article>
+        <article>
+          <h3>3. Track</h3>
+          <p>See per-word correct/incorrect counters to focus on the tough ones.</p>
+        </article>
+      </div>
     </section>
   );
 }
