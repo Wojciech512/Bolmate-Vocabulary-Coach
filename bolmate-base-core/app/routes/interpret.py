@@ -1,7 +1,9 @@
 import mimetypes
 
 from flask import Blueprint, jsonify, request
+from pydantic import ValidationError
 
+from app.schemas.interpret import InterpretRequest
 from app.services.openai_service import encode_file_to_base64, interpret_text_with_ai
 from config import get_settings
 
@@ -16,8 +18,13 @@ def interpret_payload():
 
     # Handle raw text
     if request.is_json:
-        payload = request.get_json(silent=True) or {}
-        text = payload.get("text") or ""
+        try:
+            payload = request.get_json(silent=True) or {}
+            data = InterpretRequest(**payload)
+            native_language = data.native_language
+            text = data.text
+        except ValidationError as e:
+            return jsonify({"error": "Invalid request data", "details": e.errors()}), 400
         items = interpret_text_with_ai(text, native_language) if text else []
         return jsonify({"items": items})
 

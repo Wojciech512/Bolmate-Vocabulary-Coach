@@ -15,17 +15,8 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import { interpretText, createFlashcard } from "../api";
+import { interpretText, createFlashcard, type InterpretedItem } from "../api";
 import { useLanguage } from "../context/LanguageContext";
-
-type InterpretedItem = {
-  source_word: string;
-  translated_word: string;
-  native_language?: string;
-  source_language?: string;
-  example_sentence?: string;
-  example_sentence_translated?: string;
-};
 
 export default function InterpretForm() {
   const { nativeLanguage } = useLanguage();
@@ -45,9 +36,10 @@ export default function InterpretForm() {
       const res = await interpretText(input, nativeLanguage);
       setResults(res.data.items || []);
     } catch (err: unknown) {
-      const errorMessage = err && typeof err === 'object' && 'response' in err
-        ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
-        : undefined;
+      const errorMessage =
+        err && typeof err === "object" && "response" in err
+          ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
+          : undefined;
       setError(errorMessage || "Interpretation failed");
     } finally {
       setLoading(false);
@@ -66,9 +58,10 @@ export default function InterpretForm() {
       });
       setAddedIds((prev) => new Set(prev).add(index));
     } catch (err: unknown) {
-      const errorMessage = err && typeof err === 'object' && 'response' in err
-        ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
-        : undefined;
+      const errorMessage =
+        err && typeof err === "object" && "response" in err
+          ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
+          : undefined;
       setError(errorMessage || "Failed to add flashcard");
     } finally {
       setAddingIds((prev) => {
@@ -95,9 +88,10 @@ export default function InterpretForm() {
         }
       }
     } catch (err: unknown) {
-      const errorMessage = err && typeof err === 'object' && 'response' in err
-        ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
-        : undefined;
+      const errorMessage =
+        err && typeof err === "object" && "response" in err
+          ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
+          : undefined;
       setError(errorMessage || "Failed to add all flashcards");
     } finally {
       setAddingAll(false);
@@ -111,8 +105,8 @@ export default function InterpretForm() {
           <Box>
             <Typography variant="h6">Interpret notebook text</Typography>
             <Typography variant="body2" color="text.secondary">
-              Paste text or sentences from your notebook. We'll extract unique words and
-              translate them.
+              Paste text or sentences from your notebook. We&#39;ll extract unique words
+              and and translate them.
             </Typography>
           </Box>
 

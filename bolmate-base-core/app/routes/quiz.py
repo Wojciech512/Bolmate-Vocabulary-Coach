@@ -1,10 +1,12 @@
 import random
 
 from flask import Blueprint, jsonify, request
+from pydantic import ValidationError
 from sqlalchemy import func
 
 from app.db.session import SessionLocal
 from app.models import Flashcard
+from app.schemas.quiz import SubmitQuizAnswerRequest, GenerateQuizRequest
 from app.services.openai_service import generate_hint_for_flashcard, generate_quiz_questions
 
 quiz_bp = Blueprint("quiz", __name__)
@@ -32,14 +34,16 @@ def get_quiz_question():
 
 @quiz_bp.post("/quiz")
 def submit_quiz_answer():
-    payload = request.get_json(silent=True) or {}
-    flashcard_id = payload.get("flashcard_id")
-    answer = (payload.get("answer") or "").strip().lower()
-    if not flashcard_id:
-        return jsonify({"error": "flashcard_id is required"}), 400
+    try:
+        payload = request.get_json(silent=True) or {}
+        data = SubmitQuizAnswerRequest(**payload)
+    except ValidationError as e:
+        return jsonify({"error": "Invalid request data", "details": e.errors()}), 400
+
+    answer = data.answer.strip().lower()
     session = SessionLocal()
     try:
-        card = session.query(Flashcard).get(flashcard_id)
+        card = session.query(Flashcard).get(data.flashcard_id)
         if not card:
             return jsonify({"error": "Flashcard not found"}), 404
 
@@ -71,17 +75,19 @@ def submit_quiz_answer():
 
 @quiz_bp.post("/quiz/generate")
 def generate_quiz():
-    payload = request.get_json(silent=True) or {}
-    num_questions = int(payload.get("num_questions", 5))
-    source_language = payload.get("source_language")
-    difficulty = payload.get("difficulty_level")
+    try:
+        payload = request.get_json(silent=True) or {}
+        data = GenerateQuizRequest(**payload)
+    except ValidationError as e:
+        return jsonify({"error": "Invalid request data", "details": e.errors()}), 400
+
     session = SessionLocal()
     try:
         query = session.query(Flashcard)
-        if source_language:
-            query = query.filter(func.lower(Flashcard.source_language) == source_language.lower())
-        if difficulty:
-            query = query.filter(Flashcard.difficulty_level == difficulty)
+        if data.source_language:
+            query = query.filter(func.lower(Flashcard.source_language) == data.source_language.lower())
+        if data.difficulty_level:
+            query = query.filter(Flashcard.difficulty_level == data.difficulty_level)
         cards = query.all()
         random.shuffle(cards)
         serialized = [
@@ -95,7 +101,7 @@ def generate_quiz():
             }
             for c in cards
         ]
-        questions = generate_quiz_questions(serialized, num_questions)
+        questions = generate_quiz_questions(serialized, data.num_questions or 5)
         return jsonify({"questions": questions})
     finally:
         session.close()

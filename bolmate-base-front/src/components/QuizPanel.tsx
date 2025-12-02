@@ -9,25 +9,13 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { getQuizQuestion, submitQuizAnswer } from "../api";
-
-type QuizState = {
-  flashcard_id: number;
-  source_word: string;
-  translated_word: string;
-};
-
-type HintData = {
-  hint?: string;
-  example_sentence?: string;
-  example_translation?: string;
-};
+import { getQuizQuestion, submitQuizAnswer, type QuizQuestion, type QuizAnswerResponse } from "../api";
 
 export default function QuizPanel() {
-  const [question, setQuestion] = useState<QuizState | null>(null);
+  const [question, setQuestion] = useState<QuizQuestion | null>(null);
   const [answer, setAnswer] = useState("");
   const [feedback, setFeedback] = useState<string | null>(null);
-  const [hint, setHint] = useState<HintData | null>(null);
+  const [hint, setHint] = useState<Pick<QuizAnswerResponse, 'hint' | 'example_sentence' | 'example_translation'> | null>(null);
   const [loading, setLoading] = useState(false);
 
   const loadQuestion = async () => {

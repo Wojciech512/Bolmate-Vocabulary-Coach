@@ -7,12 +7,112 @@ const api = axios.create({
   },
 });
 
+// ============= Request Types =============
+
 export type CreateFlashcardInput = {
   source_word: string;
   translated_word: string;
   native_language?: string;
   source_language?: string;
+  is_manual?: boolean;
+  difficulty_level?: string;
+  example_sentence?: string;
+  example_sentence_translated?: string;
 };
+
+export type GenerateQuizPayload = {
+  num_questions?: number;
+  source_language?: string;
+  difficulty_level?: string;
+};
+
+export type SubmitQuizAnswerPayload = {
+  flashcard_id: number;
+  answer: string;
+};
+
+export type InterpretTextPayload = {
+  text: string;
+  native_language: string;
+};
+
+// ============= Response Types =============
+
+export type Flashcard = {
+  id: number;
+  source_word: string;
+  source_language: string;
+  translated_word: string;
+  native_language: string;
+  example_sentence: string | null;
+  example_sentence_translated: string | null;
+  difficulty_level: string | null;
+  is_manual: boolean;
+  correct_count: number;
+  incorrect_count: number;
+  created_at: string | null;
+};
+
+export type QuizQuestion = {
+  flashcard_id: number;
+  source_word: string;
+  source_language: string;
+  native_language: string;
+  translated_word: string;
+  correct_count: number;
+  incorrect_count: number;
+};
+
+export type QuizAnswerResponse = {
+  correct: boolean;
+  correctAnswer: string;
+  stats: {
+    correct_count: number;
+    incorrect_count: number;
+  };
+  hint?: string;
+  example_sentence?: string;
+  example_translation?: string;
+};
+
+export type GeneratedQuizQuestion = {
+  question: string;
+  type: string;
+  answer: string;
+  options?: string[];
+};
+
+export type GenerateQuizResponse = {
+  questions: GeneratedQuizQuestion[];
+};
+
+export type InterpretedItem = {
+  source_word: string;
+  translated_word: string;
+  native_language?: string;
+  source_language?: string;
+  example_sentence?: string;
+  example_sentence_translated?: string;
+};
+
+export type InterpretResponse = {
+  items: InterpretedItem[];
+};
+
+export type Language = {
+  code: string;
+  label: string;
+};
+
+export type LanguagesResponse = {
+  languages: Language[];
+};
+
+export type DeleteResponse = {
+  status: string;
+};
+
+// ============= API Functions =============
 
 // TODO selektor języka na który mają być wykonywane tłumaczenia - przy zmianie języka w aplikacji wszystkie obecne fiszki zostają przetłumaczone na wybrany język
 // TODO opisy aplikacji że jest uniwersalna dla każdego języka
@@ -22,22 +122,29 @@ export type CreateFlashcardInput = {
 // TODO logo "Bolmate - Language tutor"
 // TODO testy
 // TODO responsywność
-export const fetchFlashcards = () => api.get("/api/flashcards");
+
+export const fetchFlashcards = () =>
+  api.get<Flashcard[]>("/api/flashcards");
+
 export const createFlashcard = (data: CreateFlashcardInput) =>
-  api.post("/api/flashcards", data);
-export const deleteFlashcard = (id: number) => api.delete(`/api/flashcards/${id}`);
-export const submitQuizAnswer = (payload: { flashcard_id: number; answer: string }) =>
-  api.post("/api/quiz", payload);
-export const getQuizQuestion = () => api.get("/api/quiz");
-export type GenerateQuizPayload = {
-  num_questions?: number;
-  flashcard_ids?: number[];
-};
+  api.post<Flashcard>("/api/flashcards", data);
+
+export const deleteFlashcard = (id: number) =>
+  api.delete<DeleteResponse>(`/api/flashcards/${id}`);
+
+export const getQuizQuestion = () =>
+  api.get<QuizQuestion>("/api/quiz");
+
+export const submitQuizAnswer = (payload: SubmitQuizAnswerPayload) =>
+  api.post<QuizAnswerResponse>("/api/quiz", payload);
 
 export const generateQuiz = (payload: GenerateQuizPayload) =>
-  api.post("/api/quiz/generate", payload);
+  api.post<GenerateQuizResponse>("/api/quiz/generate", payload);
+
 export const interpretText = (text: string, native_language: string) =>
-  api.post("/api/interpret", { text, native_language });
-export const fetchLanguages = () => api.get("/api/languages");
+  api.post<InterpretResponse>("/api/interpret", { text, native_language } as InterpretTextPayload);
+
+export const fetchLanguages = () =>
+  api.get<LanguagesResponse>("/api/languages");
 
 export default api;
