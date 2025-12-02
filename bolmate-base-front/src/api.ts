@@ -129,6 +129,7 @@ export type DeleteResponse = {
 };
 // TODO "Failed to switch language. Please try again." oraz łądowanie w postaci pojawiającego się snackbara
 // TODO sticky header
+// TODO Daily quiz powinien określać w jakim języku słowa oczekuje, jeżeli jests więcej niż 2 będzie informować że istnieje zapisanych wiele opcji
 // TODO błędy aplikacji przedstawioane w podstaci snackbarów
 // TODO poprawne operacje przedstawiane w postaci snackbarów
 // TODO "Flashcard already exists for this language pair." powinno dokładać tłumaczenie do listy

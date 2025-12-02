@@ -45,7 +45,7 @@ export default function FlashcardList({ flashcards, onDeleted }: Props) {
           <TableHead>
             <TableRow>
               <TableCell>Source</TableCell>
-              <TableCell>Translation</TableCell>
+              <TableCell>Target translation</TableCell>
               <TableCell>Stats</TableCell>
               <TableCell align="right">Actions</TableCell>
             </TableRow>

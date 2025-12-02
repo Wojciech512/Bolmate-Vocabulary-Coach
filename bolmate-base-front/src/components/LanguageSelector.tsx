@@ -9,6 +9,7 @@ import {
   SelectChangeEvent,
   Snackbar,
   Alert,
+  Tooltip,
 } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { useLanguage } from "../context/LanguageContext";
@@ -16,11 +17,13 @@ import { useLanguage } from "../context/LanguageContext";
 const LanguageSelector = () => {
   const { nativeLanguage, languages, isSwitching, switchToLanguage } = useLanguage();
   const [selected, setSelected] = useState(nativeLanguage);
-  const [snackbar, setSnackbar] = useState<{
-    open: boolean;
-    message: string;
-    severity: "success" | "error" | "info";
-  }>({ open: false, message: "", severity: "info" });
+  const [tooltipOpen, setTooltipOpen] = useState(false);
+  const [selectOpen, setSelectOpen] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "info" as "success" | "error" | "info",
+  });
 
   useEffect(() => {
     setSelected(nativeLanguage);
@@ -32,6 +35,7 @@ const LanguageSelector = () => {
     const newLang = event.target.value;
     setSelected(newLang);
     setSnackbar({ open: false, message: "", severity: "info" });
+
     try {
       const response = await switchToLanguage(newLang);
       if (response) {
@@ -44,12 +48,13 @@ const LanguageSelector = () => {
         } else {
           setSnackbar({
             open: true,
-            message: `Translated ${response.meta.translated_count} flashcard${response.meta.translated_count !== 1 ? 's' : ''} (skipped ${response.meta.skipped_count}).`,
+            message: `Translated ${response.meta.translated_count} flashcard${
+              response.meta.translated_count !== 1 ? "s" : ""
+            } (skipped ${response.meta.skipped_count}).`,
             severity: "success",
           });
         }
       } else {
-        // Language was already selected or no change needed
         setSnackbar({
           open: true,
           message: "Language updated.",
@@ -59,15 +64,16 @@ const LanguageSelector = () => {
     } catch (error: any) {
       console.error("Language switch failed", error);
       const errorMsg = error?.response?.data?.error;
+
       if (errorMsg && errorMsg.includes("No flashcards")) {
         setSnackbar({
           open: true,
           message: "Language switched. Add flashcards to translate them.",
           severity: "info",
         });
-        // Still update the language even if no flashcards exist
         return;
       }
+
       setSnackbar({
         open: true,
         message: "Failed to switch language. Please try again.",
@@ -85,23 +91,63 @@ const LanguageSelector = () => {
     <>
       <Box display="flex" alignItems="center" gap={1}>
         <LanguageIcon color="action" />
-        <FormControl size="small" sx={{ minWidth: 170 }}>
-          <InputLabel id="language-selector-label">Target Language</InputLabel>
-          <Select
-            labelId="language-selector-label"
-            label="Target Language"
-            value={selected}
-            disabled={!options.length || isSwitching}
-            onChange={handleChange}
+
+        <Tooltip
+          open={tooltipOpen && !selectOpen}
+          title="The language into which translations will be made"
+          placement="bottom-start"
+          slotProps={{
+            tooltip: {
+              sx: { mt: 1, fontSize: "0.8rem", maxWidth: 260 },
+            },
+          }}
+        >
+          <FormControl
+            size="small"
+            sx={{ minWidth: 170, position: "relative" }}
+            onMouseEnter={() => !selectOpen && setTooltipOpen(true)}
+            onMouseLeave={() => setTooltipOpen(false)}
           >
-            {options.map((lang) => (
-              <MenuItem key={lang.code} value={lang.code}>
-                {lang.label} ({lang.code.toUpperCase()})
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        {isSwitching && <CircularProgress size={20} thickness={5} />}
+            <InputLabel id="language-selector-label">Target Language</InputLabel>
+            <Select
+              labelId="language-selector-label"
+              label="Target Language"
+              value={selected}
+              disabled={!options.length || isSwitching}
+              onChange={handleChange}
+              onOpen={() => {
+                setSelectOpen(true);
+                setTooltipOpen(false);
+              }}
+              onClose={() => setSelectOpen(false)}
+              IconComponent={isSwitching ? () => null : undefined}
+              endAdornment={
+                isSwitching ? (
+                  <CircularProgress
+                    size={20}
+                    thickness={5}
+                    sx={{
+                      position: "absolute",
+                      right: 14,
+                      pointerEvents: "none",
+                    }}
+                  />
+                ) : null
+              }
+              sx={{
+                "& .MuiSelect-select": {
+                  pr: isSwitching ? "48px !important" : undefined,
+                },
+              }}
+            >
+              {options.map((lang) => (
+                <MenuItem key={lang.code} value={lang.code}>
+                  {lang.label} ({lang.code.toUpperCase()})
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Tooltip>
       </Box>
       <Snackbar
         open={snackbar.open}
@@ -110,8 +156,8 @@ const LanguageSelector = () => {
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
         <Alert
-          onClose={handleCloseSnackbar}
           severity={snackbar.severity}
+          onClose={handleCloseSnackbar}
           sx={{ width: "100%" }}
         >
           {snackbar.message}
