@@ -162,6 +162,7 @@ export type BulkCreateFlashcardsResponse = {
 // TODO optymalizacja zapytań do AI żeby mniej płacić
 // TODO aktualizacja dokumentacji
 // TODO testy i formatowanie kodu
+// TODO gdy odpowiedzono poprawnie w quiz to chceck powinien być zablokowany do następnego quizu po kliknięciu next word
 // TODO responsywność mobilne
 export const fetchFlashcards = () => api.get<Flashcard[]>("/api/flashcards");
 

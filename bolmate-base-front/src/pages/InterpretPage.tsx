@@ -6,10 +6,10 @@ export default function InterpretPage() {
     <Box>
       <Box mb={3}>
         <Typography variant="h5" gutterBottom>
-          Interpret (OCR & AI)
+          Extract & Learn (OCR & AI)
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Drop text to extract vocabulary and turn it into flashcards.
+          Drop text or files to extract vocabulary and turn it into flashcards.
         </Typography>
       </Box>
       <InterpretForm />

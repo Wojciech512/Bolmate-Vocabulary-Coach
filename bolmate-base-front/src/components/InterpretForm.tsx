@@ -220,7 +220,7 @@ export default function InterpretForm() {
       <CardContent>
         <Stack spacing={2}>
           <Box>
-            <Typography variant="h6">Interpret notebook text</Typography>
+            <Typography variant="h6">Interpret text or files</Typography>
             <Typography variant="body2" color="text.secondary">
               Paste text or upload files (.pdf, .docx, .txt, .png, .jpg). We&#39;ll
               extract unique words, detect existing translations, and create flashcards.
