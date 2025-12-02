@@ -114,8 +114,8 @@ export default function InterpretForm() {
       results.flatMap((item) => [
         item.source_language,
         item.native_language || nativeLanguage,
-      ])
-    )
+      ]),
+    ),
   ).filter(Boolean);
 
   const handleInterpret = async () => {
@@ -349,11 +349,7 @@ export default function InterpretForm() {
           {results.length > 0 && (
             <Box>
               <Divider sx={{ my: 1 }} />
-              <Stack
-                direction={{ xs: "column", sm: "row" }}
-                spacing={2}
-                sx={{ mb: 2 }}
-              >
+              <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ mb: 2 }}>
                 <TextField
                   size="small"
                   placeholder="Search words..."
@@ -402,7 +398,7 @@ export default function InterpretForm() {
                         results.findIndex(
                           (r) =>
                             r.source_word === item.source_word &&
-                            r.translated_word === item.translated_word
+                            r.translated_word === item.translated_word,
                         ) || idx;
                       const isSameLanguage = item.source_language === nativeLanguage;
                       return (

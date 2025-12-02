@@ -25,21 +25,21 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const [darkMode, setDarkMode] = useState(() => {
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
     const saved = localStorage.getItem("darkMode");
     return saved !== null ? JSON.parse(saved) : true;
   });
+
+  const toggleDarkMode = () => {
+    setDarkMode((prev: boolean) => !prev);
+  };
 
   useEffect(() => {
     localStorage.setItem("darkMode", JSON.stringify(darkMode));
   }, [darkMode]);
 
-  const toggleDarkMode = () => {
-    setDarkMode((prev) => !prev);
-  };
-
   const theme = useMemo(() => {
-    let newTheme = createTheme({
+    const newTheme = createTheme({
       palette: {
         mode: darkMode ? "dark" : "light",
         primary: {

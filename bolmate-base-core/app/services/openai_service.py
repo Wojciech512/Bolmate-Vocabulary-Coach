@@ -3,7 +3,6 @@ from __future__ import annotations
 import base64
 import hashlib
 import logging
-from functools import lru_cache
 from typing import Any, Dict, List
 
 from openai import OpenAI

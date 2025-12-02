@@ -1,8 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import {
-  Language,
-  fetchLanguages,
-} from "../api";
+import { Language, fetchLanguages } from "../api";
 
 type LanguageContextValue = {
   nativeLanguage: string;

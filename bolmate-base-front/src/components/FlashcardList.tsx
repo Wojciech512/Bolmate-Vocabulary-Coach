@@ -82,14 +82,12 @@ export default function FlashcardList({ flashcards, onDeleted }: Props) {
   });
 
   const availableLanguages = Array.from(
-    new Set(
-      flashcards.flatMap((card) => [card.source_language, card.native_language])
-    )
+    new Set(flashcards.flatMap((card) => [card.source_language, card.native_language])),
   ).filter(Boolean);
 
   const paginatedFlashcards = filteredFlashcards.slice(
     page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
+    page * rowsPerPage + rowsPerPage,
   );
 
   return (
@@ -98,11 +96,7 @@ export default function FlashcardList({ flashcards, onDeleted }: Props) {
         <Typography variant="h6" gutterBottom>
           Saved words
         </Typography>
-        <Stack
-          direction={{ xs: "column", sm: "row" }}
-          spacing={2}
-          sx={{ mb: 2 }}
-        >
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ mb: 2 }}>
           <TextField
             size="small"
             placeholder="Search words..."
@@ -217,7 +211,14 @@ export default function FlashcardList({ flashcards, onDeleted }: Props) {
           </TableBody>
         </Table>
         {filteredFlashcards.length > 0 && (
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mt: 2,
+            }}
+          >
             <FormControl size="small" sx={{ minWidth: 120 }}>
               <InputLabel>Words per page</InputLabel>
               <Select
@@ -230,7 +231,7 @@ export default function FlashcardList({ flashcards, onDeleted }: Props) {
               >
                 {Array.from(
                   { length: Math.floor((maxPerPage - minPerPage) / 5) + 1 },
-                  (_, i) => minPerPage + i * 5
+                  (_, i) => minPerPage + i * 5,
                 ).map((value) => (
                   <MenuItem key={value} value={value}>
                     {value}
@@ -246,9 +247,7 @@ export default function FlashcardList({ flashcards, onDeleted }: Props) {
               rowsPerPage={rowsPerPage}
               onRowsPerPageChange={handleChangeRowsPerPage}
               rowsPerPageOptions={[]}
-              labelDisplayedRows={({ from, to, count }) =>
-                `${from}-${to} of ${count}`
-              }
+              labelDisplayedRows={({ from, to, count }) => `${from}-${to} of ${count}`}
             />
           </Box>
         )}

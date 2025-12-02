@@ -9,7 +9,6 @@ export const triggerConfetti = (streak: number) => {
     return Math.random() * (max - min) + min;
   }
 
-  // Different confetti patterns based on streak
   if (streak === 3) {
     // Simple confetti from left side
     confetti({

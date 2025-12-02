@@ -84,7 +84,7 @@ function Layout({ children }: LayoutProps) {
               <StyledButton
                 key={item.path}
                 component={RouterLink}
-                to={item.path}
+                to={item.path as string}
                 variant={isActive ? "secondary" : "text"}
                 sx={{
                   color: isActive ? undefined : "text.primary",

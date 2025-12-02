@@ -5,9 +5,9 @@ Production-ready learning tool built on the bolmate-base stack (React 18 + TypeS
 ## 1) Architecture overview
 - **Frontend (bolmate-base-front)** – React 18 + TypeScript SPA using Vite and React Router. Pages: Home, Flashcards (add/list), Quiz (one-word loop with reverse mode), Interpret (OCR/text ingestion). Axios client reads `VITE_API_BASE_URL` for backend communication.
 - **Backend (bolmate-base-core)** – Flask 3 app factory with blueprints under `/api`: health, flashcards CRUD (including bulk operations), quiz (with reverse mode support), AI quiz generation, interpret (text and file), languages (with switching capability). OpenAI integration lives in `app/services/openai_service.py` with in-memory caching. SQLAlchemy 1.4 models + Alembic migrations.
-- **Database** – PostgreSQL 15 storing flashcards (with unique constraint on source_word+language pair), quiz items, and users (for future multi-user).
+- **Database** – PostgreSQL 15+ storing flashcards (with unique constraint on source_word+language pair), quiz items, and users (for future multi-user).
 - **AI/OCR** – OpenAI API (gpt-4o-mini for vision, configurable model for text) for hints, example sentences, quiz generation, and text/image interpretation. Supports PDF (PyPDF2), DOCX (python-docx), and images (Vision API). Includes response caching with 1000-item limit.
-- **Docker Compose** – Orchestrates db (PostgreSQL 15), backend (port 5000), frontend (port 3000) services.
+- **Docker Compose** – Orchestrates db (PostgreSQL 15+), backend (port 5000), frontend (port 3000) services.
 
 Data flow: user adds words → stored as `flashcards` with language metadata → quiz endpoint serves random card (normal or reversed) → answer submission updates stats (correct_count/incorrect_count) + optional AI hint → interpret endpoint can ingest pasted text/files, ask AI to extract translations with deduplication → enriched flashcards ready for study.
 

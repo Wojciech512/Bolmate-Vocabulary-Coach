@@ -45,10 +45,10 @@ const StyledLinearProgress = styled(LinearProgress)(({ theme }) => ({
   },
 }));
 
-const MilestoneMarker = styled(Box)<{ position: number }>(
-  ({ theme, position }) => ({
+const MilestoneMarker = styled(Box)<{ markerPosition: number }>(
+  ({ theme, markerPosition }) => ({
     position: "absolute",
-    left: `${position}%`,
+    left: `${markerPosition}%`,
     top: 0,
     bottom: 0,
     width: 2,
@@ -66,7 +66,7 @@ const MilestoneMarker = styled(Box)<{ position: number }>(
       backgroundColor: theme.palette.background.paper,
       border: `2px solid ${theme.palette.divider}`,
     },
-  })
+  }),
 );
 
 interface StreakProgressBarProps {
@@ -88,7 +88,9 @@ export default function StreakProgressBar({
           Streak: {streak} / {maxStreak}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {streak >= 10 ? "Max!" : `Next milestone: ${milestones.find((m) => m > streak) || maxStreak}`}
+          {streak >= 10
+            ? "Max!"
+            : `Next milestone: ${milestones.find((m) => m > streak) || maxStreak}`}
         </Typography>
       </Box>
       <ShimmerBox>
@@ -96,7 +98,7 @@ export default function StreakProgressBar({
           {milestones.map((milestone) => (
             <MilestoneMarker
               key={milestone}
-              position={(milestone / maxStreak) * 100}
+              markerPosition={(milestone / maxStreak) * 100}
             />
           ))}
           <StyledLinearProgress variant="determinate" value={progress} />

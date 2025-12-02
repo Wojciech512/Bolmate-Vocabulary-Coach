@@ -49,7 +49,12 @@ export function SnackbarProvider({ children }: SnackbarProviderProps) {
         onClose={handleClose}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
-        <Alert onClose={handleClose} severity={severity} variant="filled" sx={{ width: "100%" }}>
+        <Alert
+          onClose={handleClose}
+          severity={severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
           {message}
         </Alert>
       </Snackbar>
