@@ -1,16 +1,32 @@
-"""Language schemas."""
+"""Schemas for language switching and translation operations."""
 
-from pydantic import BaseModel
+from typing import List, Optional
 
+from pydantic import BaseModel, Field
 
-class Language(BaseModel):
-    """A supported language."""
-
-    code: str
-    label: str
+from app.schemas.flashcard import FlashcardResponse
 
 
-class LanguagesResponse(BaseModel):
-    """Response schema for languages list."""
+class SwitchLanguageRequest(BaseModel):
+    """Payload for translating flashcards into a new target language."""
 
-    languages: list[Language]
+    target_language: str = Field(..., min_length=2, max_length=10)
+    flashcard_ids: Optional[List[int]] = Field(None, min_items=1)
+    force_retranslate: bool = False
+
+
+class SwitchLanguageMeta(BaseModel):
+    """Metadata that accompanies a language switch operation."""
+
+    target_language: str
+    translated_count: int
+    skipped_count: int
+    force_retranslate: bool
+
+
+class SwitchLanguageResponse(BaseModel):
+    """Response containing translated flashcards and operation details."""
+
+    flashcards: List[FlashcardResponse]
+    meta: SwitchLanguageMeta
+

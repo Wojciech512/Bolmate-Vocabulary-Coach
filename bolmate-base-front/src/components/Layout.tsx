@@ -1,5 +1,6 @@
 import { AppBar, Box, Button, Container, Toolbar, Typography } from "@mui/material";
 import { Link as RouterLink, useLocation } from "react-router-dom";
+import LanguageSelector from "./LanguageSelector";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -49,6 +50,7 @@ function Layout({ children }: LayoutProps) {
             </Typography>
           </Box>
           <Box sx={{ flexGrow: 1 }} />
+          <LanguageSelector />
           {navItems.map((item) => {
             const isActive =
               location.pathname === item.path ||
