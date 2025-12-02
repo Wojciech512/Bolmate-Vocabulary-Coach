@@ -159,7 +159,6 @@ export type BulkCreateFlashcardsResponse = {
   skipped_count: number;
   error_details?: string[];
 };
-// TODO healthchecks dla serwisów
 // TODO optymalizacja zapytań do AI żeby mniej płacić
 // TODO aktualizacja dokumentacji
 // TODO testy i formatowanie kodu
