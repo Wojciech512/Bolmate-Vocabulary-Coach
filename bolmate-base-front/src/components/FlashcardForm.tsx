@@ -97,7 +97,7 @@ export default function FlashcardForm({ onCreated }: Props) {
               >
                 {languages.map((lang) => (
                   <MenuItem key={lang.code} value={lang.code}>
-                    {lang.label}
+                    {lang.label} ({lang.code.toUpperCase()})
                   </MenuItem>
                 ))}
               </Select>
@@ -105,7 +105,9 @@ export default function FlashcardForm({ onCreated }: Props) {
           </Box>
           {isSameLanguage && (
             <Alert severity="warning" variant="outlined">
-              Warning: Source language is the same as target language ({nativeLanguage.toUpperCase()}). You may be translating to the same language.
+              Warning: Source language is the same as target language (
+              {nativeLanguage.toUpperCase()}). You may be translating to the same
+              language.
             </Alert>
           )}
           <TextField
