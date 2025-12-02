@@ -13,13 +13,16 @@ import {
   Stack,
   TextField,
   Typography,
+  CircularProgress,
 } from "@mui/material";
 import { useState } from "react";
 import { interpretText, createFlashcard, type InterpretedItem } from "../api";
 import { useLanguage } from "../context/LanguageContext";
+import { useSnackbar } from "../context/SnackbarContext";
 
 export default function InterpretForm() {
   const { nativeLanguage } = useLanguage();
+  const { showSuccess } = useSnackbar();
   const [input, setInput] = useState("");
   const [results, setResults] = useState<InterpretedItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -35,12 +38,10 @@ export default function InterpretForm() {
     try {
       const res = await interpretText(input, nativeLanguage);
       setResults(res.data.items || []);
-    } catch (err: unknown) {
-      const errorMessage =
-        err && typeof err === "object" && "response" in err
-          ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
-          : undefined;
-      setError(errorMessage || "Interpretation failed");
+      showSuccess(`Interpreted ${res.data.items?.length || 0} words successfully`);
+    } catch {
+      // Error is handled by global interceptor
+      setError("Interpretation failed");
     } finally {
       setLoading(false);
     }
@@ -57,12 +58,10 @@ export default function InterpretForm() {
         source_language: item.source_language || "es",
       });
       setAddedIds((prev) => new Set(prev).add(index));
-    } catch (err: unknown) {
-      const errorMessage =
-        err && typeof err === "object" && "response" in err
-          ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
-          : undefined;
-      setError(errorMessage || "Failed to add flashcard");
+      showSuccess("Flashcard added successfully");
+    } catch {
+      // Error is handled by global interceptor
+      setError("Failed to add flashcard");
     } finally {
       setAddingIds((prev) => {
         const newSet = new Set(prev);
@@ -76,6 +75,7 @@ export default function InterpretForm() {
     setAddingAll(true);
     setError(null);
     try {
+      const toAdd = results.filter((_, i) => !addedIds.has(i));
       for (let i = 0; i < results.length; i++) {
         if (!addedIds.has(i)) {
           await createFlashcard({
@@ -87,12 +87,10 @@ export default function InterpretForm() {
           setAddedIds((prev) => new Set(prev).add(i));
         }
       }
-    } catch (err: unknown) {
-      const errorMessage =
-        err && typeof err === "object" && "response" in err
-          ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
-          : undefined;
-      setError(errorMessage || "Failed to add all flashcards");
+      showSuccess(`Added ${toAdd.length} flashcards successfully`);
+    } catch {
+      // Error is handled by global interceptor
+      setError("Failed to add all flashcards");
     } finally {
       setAddingAll(false);
     }
@@ -123,7 +121,7 @@ export default function InterpretForm() {
           <Stack direction="row" spacing={1} justifyContent="flex-start">
             <Button
               variant="contained"
-              startIcon={<CloudUploadIcon />}
+              startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <CloudUploadIcon />}
               onClick={handleInterpret}
               disabled={loading || !input}
             >

@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5000",
@@ -6,6 +6,26 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
+
+// Global error handler - will be set up by the app
+let globalErrorHandler: ((message: string) => void) | null = null;
+
+export function setGlobalErrorHandler(handler: (message: string) => void) {
+  globalErrorHandler = handler;
+}
+
+// Response interceptor for global error handling
+api.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError<{ error?: string }>) => {
+    if (globalErrorHandler) {
+      const message =
+        error.response?.data?.error || error.message || "An unexpected error occurred";
+      globalErrorHandler(message);
+    }
+    return Promise.reject(error);
+  },
+);
 
 // ============= Request Types =============
 
@@ -128,21 +148,14 @@ export type SwitchLanguageResponse = {
 export type DeleteResponse = {
   status: string;
 };
-// TODO czy w tekście znajdują się już tłumaczenia danego słowa, jeżeli tak to wykorzystaj je do fiszki
-// TODO sticky header
-// TODO Daily quiz powinien określać w jakim języku słowa oczekuje, jeżeli jests więcej niż 2 będzie informować że istnieje zapisanych wiele opcji
-// TODO błędy aplikacji przedstawioane w podstaci snackbarów
-// TODO poprawne operacje przedstawiane w postaci snackbarów
-// TODO sprawdzanie duplikatów i agregowanie podobnych słów
-// TODO paginacja w flashcards
-// TODO rozróżnienie zwrotów od pojedyńczych słów
+// TODO jeżeli w podanym tekście znajdują się już tłumaczenia danego słowa, jeżeli tak to wykorzystaj je do fiszki i połącz te słowa, sprawdzanie duplikatów i agregowanie podobnych słów
 // TODO interpretowanie danych z plików tekstowych (.pdf, .docx itd.), zdjęciowych w Interpret (OCR & AI)
-// TODO skopiowanie przycisków z https://bolmate.nl/
+// TODO generowanie memów tak aby zapamiętywać słowa?
 // TODO quiz w postaci obracanych kart (animacje)
 // TODO testy
-// TODO wszystkie teksty w aplikacji po angielsku
 // TODO konfetti jeżeli przejdzie się przez sekwencje 10 słów dobrze pod rząd
 // TODO responsywność mobilne
+// TODO aktualizacja dokumentacji
 export const fetchFlashcards = () => api.get<Flashcard[]>("/api/flashcards");
 
 export const createFlashcard = (data: CreateFlashcardInput) =>
@@ -152,7 +165,9 @@ export const deleteFlashcard = (id: number) =>
   api.delete<DeleteResponse>(`/api/flashcards/${id}`);
 
 export const getQuizQuestion = (reverseMode: boolean, targetLanguage?: string) =>
-  api.get<QuizQuestion>("/api/quiz", { params: { reverse: reverseMode, target_language: targetLanguage } });
+  api.get<QuizQuestion>("/api/quiz", {
+    params: { reverse: reverseMode, target_language: targetLanguage },
+  });
 
 export const submitQuizAnswer = (payload: SubmitQuizAnswerPayload) =>
   api.post<QuizAnswerResponse>("/api/quiz", payload);

@@ -9,6 +9,7 @@ import {
   Switch,
   TextField,
   Typography,
+  CircularProgress,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import {
@@ -29,12 +30,14 @@ export default function QuizPanel() {
     "hint" | "example_sentence" | "example_translation"
   > | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingQuestion, setLoadingQuestion] = useState(false);
   const [reverseMode, setReverseMode] = useState(false);
 
   const loadQuestion = async () => {
     setFeedback(null);
     setHint(null);
     setAnswer("");
+    setLoadingQuestion(true);
     try {
       const res = await getQuizQuestion(reverseMode, nativeLanguage);
       setQuestion(res.data);
@@ -45,6 +48,8 @@ export default function QuizPanel() {
           : undefined;
       setFeedback(errorMessage || "No questions available");
       setQuestion(null);
+    } finally {
+      setLoadingQuestion(false);
     }
   };
 
@@ -71,12 +76,9 @@ export default function QuizPanel() {
         example_sentence: res.data.example_sentence,
         example_translation: res.data.example_translation,
       });
-    } catch (err: unknown) {
-      const errorMessage =
-        err && typeof err === "object" && "response" in err
-          ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
-          : undefined;
-      setFeedback(errorMessage || "Failed to submit answer");
+    } catch {
+      // Error is handled by global interceptor
+      setFeedback("Failed to submit answer");
     } finally {
       setLoading(false);
     }
@@ -97,9 +99,14 @@ export default function QuizPanel() {
           }
           label="Reverse mode (target → native)."
         />
-        {!question && (
+        {loadingQuestion && (
+          <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", py: 4 }}>
+            <CircularProgress />
+          </Box>
+        )}
+        {!question && !loadingQuestion && !feedback && (
           <Typography variant="body2" color="text.secondary">
-            Loading question...
+            No questions available
           </Typography>
         )}
         {question && (

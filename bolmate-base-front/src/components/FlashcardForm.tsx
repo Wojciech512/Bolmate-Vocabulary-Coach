@@ -16,6 +16,8 @@ import {
 import { useState, useEffect } from "react";
 import { createFlashcard, fetchLanguages, type Language } from "../api";
 import { useLanguage } from "../context/LanguageContext";
+import { useLoading } from "../context/LoadingContext";
+import { useSnackbar } from "../context/SnackbarContext";
 import LanguageIcon from "@mui/icons-material/Language";
 
 type Props = {
@@ -24,6 +26,8 @@ type Props = {
 
 export default function FlashcardForm({ onCreated }: Props) {
   const { nativeLanguage } = useLanguage();
+  const { withLoading } = useLoading();
+  const { showSuccess } = useSnackbar();
   const [sourceWord, setSourceWord] = useState("");
   const [translation, setTranslation] = useState("");
   const [sourceLanguage, setSourceLanguage] = useState("es");
@@ -43,24 +47,23 @@ export default function FlashcardForm({ onCreated }: Props) {
       setError("Spanish word and translation are required");
       return;
     }
-    setLoading(true);
     setError(null);
+    setLoading(true);
     try {
-      await createFlashcard({
-        source_word: sourceWord,
-        translated_word: translation,
-        source_language: sourceLanguage,
-        native_language: nativeLanguage,
+      await withLoading(async () => {
+        await createFlashcard({
+          source_word: sourceWord,
+          translated_word: translation,
+          source_language: sourceLanguage,
+          native_language: nativeLanguage,
+        });
       });
       setSourceWord("");
       setTranslation("");
+      showSuccess("Flashcard created successfully");
       onCreated();
-    } catch (err: unknown) {
-      const errorMessage =
-        err && typeof err === "object" && "response" in err
-          ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
-          : undefined;
-      setError(errorMessage || "Failed to save word");
+    } catch {
+      // Error is handled by global interceptor
     } finally {
       setLoading(false);
     }

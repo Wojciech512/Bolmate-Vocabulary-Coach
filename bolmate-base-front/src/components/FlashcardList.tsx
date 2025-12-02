@@ -26,6 +26,8 @@ import {
 import { useState } from "react";
 import { Flashcard } from "../types";
 import { deleteFlashcard } from "../api";
+import { useLoading } from "../context/LoadingContext";
+import { useSnackbar } from "../context/SnackbarContext";
 
 type Props = {
   flashcards: Flashcard[];
@@ -38,10 +40,19 @@ export default function FlashcardList({ flashcards, onDeleted }: Props) {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const { withLoading } = useLoading();
+  const { showSuccess } = useSnackbar();
 
   const handleDelete = async (id: number) => {
-    await deleteFlashcard(id);
-    onDeleted();
+    try {
+      await withLoading(async () => {
+        await deleteFlashcard(id);
+      });
+      showSuccess("Flashcard deleted successfully");
+      onDeleted();
+    } catch {
+      // Error is handled by global interceptor
+    }
   };
 
   const handleChangePage = (_event: unknown, newPage: number) => {

@@ -5,16 +5,20 @@ import FlashcardList from "../components/FlashcardList";
 import { fetchFlashcards } from "../api";
 import { Flashcard } from "../types";
 import { useLanguage } from "../context/LanguageContext";
+import { useLoading } from "../context/LoadingContext";
 
 export default function FlashcardsPage() {
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const { nativeLanguage } = useLanguage();
+  const { withLoading } = useLoading();
 
   const loadFlashcards = async () => {
-    const res = await fetchFlashcards();
-    setFlashcards(
-      res.data.map((fc) => ({ ...fc, created_at: fc.created_at ?? undefined })),
-    );
+    await withLoading(async () => {
+      const res = await fetchFlashcards();
+      setFlashcards(
+        res.data.map((fc) => ({ ...fc, created_at: fc.created_at ?? undefined })),
+      );
+    });
   };
 
   useEffect(() => {
