@@ -93,8 +93,10 @@ def submit_quiz_answer():
 
         # W reverse mode sprawdzamy source_word, w normalnym translated_word
         correct_answer = (
-            (card.source_word if reverse else card.translated_word) or ""
-        ).strip().lower()
+            ((card.source_word if reverse else card.translated_word) or "")
+            .strip()
+            .lower()
+        )
         is_correct = answer == correct_answer
         if is_correct:
             card.correct_count += 1

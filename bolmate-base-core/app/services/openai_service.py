@@ -48,7 +48,9 @@ def generate_hint_for_flashcard(
     source_language: str = "es",
 ) -> dict[str, str]:
     # Check cache first
-    cache_key = _cache_key("hint", source_word, translated_word, native_language, source_language)
+    cache_key = _cache_key(
+        "hint", source_word, translated_word, native_language, source_language
+    )
     cached = _get_cached_response(cache_key)
     if cached:
         return cached

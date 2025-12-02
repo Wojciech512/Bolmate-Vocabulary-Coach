@@ -162,7 +162,6 @@ export type BulkCreateFlashcardsResponse = {
 // TODO płynne przejśćia w quiz między quizami
 // TODO responsywność nagłówka
 
-// TODO aktualizacja dokumentacji
 // TODO testy i formatowanie kodu
 export const fetchFlashcards = () => api.get<Flashcard[]>("/api/flashcards");
 

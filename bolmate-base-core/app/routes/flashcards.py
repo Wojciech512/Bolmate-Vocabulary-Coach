@@ -6,9 +6,9 @@ from sqlalchemy.exc import IntegrityError
 from app.db.session import SessionLocal
 from app.models import Flashcard
 from app.schemas.flashcard import (
+    BulkCreateFlashcardsRequest,
     CreateFlashcardRequest,
     EnrichFlashcardsRequest,
-    BulkCreateFlashcardsRequest,
 )
 from app.services.openai_service import enrich_flashcards
 from config import get_settings

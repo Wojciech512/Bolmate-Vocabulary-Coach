@@ -104,7 +104,8 @@ function Layout({ children }: LayoutProps) {
       <Box component="footer" sx={{ py: 3, bgcolor: "background.paper" }}>
         <Container>
           <Typography variant="body2" color="text.secondary" align="center">
-            React + Flask + PostgreSQL vocabulary coach
+            ReactJS + Flask + PostgreSQL, Vocabulary coach © Created 2025 by Wojciech
+            Wyleżoł
           </Typography>
         </Container>
       </Box>
