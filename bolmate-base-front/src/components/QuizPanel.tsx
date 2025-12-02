@@ -20,6 +20,8 @@ import {
 } from "../api";
 import { useLanguage } from "../context/LanguageContext";
 import { StyledButton } from "./ui";
+import StreakProgressBar from "./StreakProgressBar";
+import { triggerConfetti } from "../utils/confetti";
 
 export default function QuizPanel() {
   const { nativeLanguage } = useLanguage();
@@ -34,6 +36,7 @@ export default function QuizPanel() {
   const [loadingQuestion, setLoadingQuestion] = useState(false);
   const [reverseMode, setReverseMode] = useState(false);
   const [lastSubmittedAnswer, setLastSubmittedAnswer] = useState("");
+  const [streak, setStreak] = useState(0);
 
   const loadQuestion = async () => {
     setFeedback(null);
@@ -70,11 +73,21 @@ export default function QuizPanel() {
         answer,
       }, reverseMode);
       setLastSubmittedAnswer(answer);
-      setFeedback(
-        res.data.correct
-          ? "Correct!"
-          : `Incorrect. Correct answer: ${res.data.correctAnswer}`,
-      );
+
+      if (res.data.correct) {
+        const newStreak = streak + 1;
+        setStreak(newStreak);
+        setFeedback("Correct!");
+
+        // Trigger confetti at milestones
+        if (newStreak === 3 || newStreak === 5 || newStreak === 10) {
+          triggerConfetti(newStreak);
+        }
+      } else {
+        setStreak(0);
+        setFeedback(`Incorrect. Correct answer: ${res.data.correctAnswer}`);
+      }
+
       setHint({
         hint: res.data.hint,
         example_sentence: res.data.example_sentence,
@@ -135,6 +148,7 @@ export default function QuizPanel() {
                 {question.source_word}
               </Typography>
             </Box>
+            <StreakProgressBar streak={streak} maxStreak={10} />
             <TextField
               placeholder="Your translation"
               value={answer}

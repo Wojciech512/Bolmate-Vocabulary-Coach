@@ -162,10 +162,7 @@ export type BulkCreateFlashcardsResponse = {
 // TODO healthchecks dla serwisów
 // TODO optymalizacja zapytań do AI żeby mniej płacić
 // TODO aktualizacja dokumentacji
-// TODO przy dodawaniu bardzo dużo requestów jest wykonywanych należy to dostosować
-// TODO dodać weryfikacje powtarzających się aagadnień za pomocą AI
-
-// TODO konfetti z boków jeżeli przejdzie się przez sekwencje 3 5 i 10 słów dobrze pod rząd, progress barr widoczny nad odpowiedziami zapełnia się po każdej poprawej odpowiedzi ubywa gdy odpowie się źle
+// TODO testy i formatowanie kodu
 // TODO responsywność mobilne
 export const fetchFlashcards = () => api.get<Flashcard[]>("/api/flashcards");
 
@@ -183,7 +180,10 @@ export const getQuizQuestion = (reverseMode: boolean, targetLanguage?: string) =
     params: { reverse: reverseMode, target_language: targetLanguage },
   });
 
-export const submitQuizAnswer = (payload: SubmitQuizAnswerPayload, reverseMode: boolean) =>
+export const submitQuizAnswer = (
+  payload: SubmitQuizAnswerPayload,
+  reverseMode: boolean,
+) =>
   api.post<QuizAnswerResponse>("/api/quiz", payload, {
     params: { reverse: reverseMode },
   });
