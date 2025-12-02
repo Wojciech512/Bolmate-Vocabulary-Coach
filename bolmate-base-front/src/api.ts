@@ -14,6 +14,9 @@ export type CreateFlashcardInput = {
   source_language?: string;
 };
 
+// TODO formatery i lintery
+// TODO nieużywanie typu "any" projekt ma być silnie typowany - zweryfikować rzutowanie na typy
+
 // TODO selektor języka na który mają być wykonywane tłumaczenia - przy zmianie języka w aplikacji wszystkie obecne fiszki zostają przetłumaczone na wybrany język
 // TODO opisy aplikacji że jest uniwersalna dla każdego języka
 // TODO interpretowanie danych z plików tekstowych (.pdf, .docx itd.), zdjęciowych w Interpret (OCR & AI)
