@@ -1,4 +1,5 @@
 # Bolmate Vocabulary Coach
+<img width="1909" height="543" alt="image" src="https://github.com/user-attachments/assets/6c677890-478b-49f1-9c3b-1b396f3a0abe" />
 
 Production-ready learning tool built on the bolmate-base stack (React 18 + TypeScript frontend, Flask 3 + SQLAlchemy 1.4 backend, PostgreSQL 15, Docker Compose). It ships an MVP for rapid multi-language word entry and daily Q&A practice plus an extended multi-language, OCR/interpretation and AI-driven flashcard experience.
 
