@@ -90,16 +90,16 @@ Alembic migration `alembic/versions/279e6de8b321_initial_setup.py` creates the a
 
 ### Components (`src/components/`)
 - `Layout.tsx` – App shell with navigation bar, theme toggle, language selector, and content area.
-- 
+
 <img width="1912" height="910" alt="image" src="https://github.com/user-attachments/assets/4f80fbd9-4e3a-442d-b0ac-c083ee1ed25f" />
 
 - `FlashcardForm.tsx` – Form for adding single flashcard. Fields: source word, source language dropdown (fetched from API), translation (auto-labeled with native language). Validates same-language warning. Calls `createFlashcard()` on submit.
 - `FlashcardList.tsx` – Table of flashcards with stats (correct/incorrect counts), language badges, difficulty chips. Delete action per row. Supports filtering and sorting.
-- 
+
 <img width="1919" height="911" alt="image" src="https://github.com/user-attachments/assets/82e450f9-e488-45dc-9522-3a06b2876e51" />
 
 - `QuizPanel.tsx` – Quiz game logic. States: loading, showing question, showing feedback. Fetches question via `getQuizQuestion()`, validates answer via `submitQuizAnswer()`, displays AI hint/example, shows streak progress. Supports normal/reverse modes and language filtering.
-- 
+
 <img width="1919" height="912" alt="image" src="https://github.com/user-attachments/assets/56fcab04-bde8-4bd8-ab8e-15eef74f5882" />
 
 - `InterpretForm.tsx` – File upload + text input form. Supports drag-and-drop for files (PDF, DOCX, images). Calls `interpretFile()` or `interpretText()` based on input type. Displays extracted items as cards with preview + add buttons.
