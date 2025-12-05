@@ -103,6 +103,9 @@ Alembic migration `alembic/versions/279e6de8b321_initial_setup.py` creates the a
 <img width="1919" height="912" alt="image" src="https://github.com/user-attachments/assets/56fcab04-bde8-4bd8-ab8e-15eef74f5882" />
 
 - `InterpretForm.tsx` – File upload + text input form. Supports drag-and-drop for files (PDF, DOCX, images). Calls `interpretFile()` or `interpretText()` based on input type. Displays extracted items as cards with preview + add buttons.
+ 
+<img width="621" height="187" alt="image" src="https://github.com/user-attachments/assets/c7bd4337-0715-42e0-985c-10d55eb7ad4b" />
+
 - `LanguageSelector.tsx` – Dropdown for selecting native language. Persists to localStorage via LanguageContext.
 - `StreakProgressBar.tsx` – Visual progress bar showing current streak and stats during quiz.
 - `ui/` – Shared styled components (buttons, cards, chips) using MUI and custom styling.
